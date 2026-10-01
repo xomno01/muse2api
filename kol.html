@@ -627,6 +627,7 @@
   <!-- Tabs Navigation -->
   <nav class="tabs-bar">
     <button class="tab-btn active" onclick="showTab('tab-char')">🎭 Nhân Vật & DNA</button>
+    <button class="tab-btn" onclick="showTab('tab-script')">🎬 Kịch Bản Phim & Phỏng Vấn</button>
     <button class="tab-btn" onclick="showTab('tab-lookbook')">📸 Xưởng Chụp Lookbook</button>
     <button class="tab-btn" onclick="showTab('tab-motion')">🎬 Dựng Video Chuyển Động</button>
     <button class="tab-btn" onclick="showTab('tab-voice')">🎙️ Phòng Thu & Ghép Voice</button>
@@ -717,7 +718,77 @@
       </div>
     </section>
 
-    <!-- ==================== TAB 2: XƯỞNG CHỤP LOOKBOOK ==================== -->
+    <!-- ==================== TAB 2: KỊCH BẢN PHIM & PHỎNG VẤN ==================== -->
+    <section id="tab-script" class="tab-content">
+      <div class="bento-grid">
+        <div class="col-5">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🎬 Xưởng Dựng Kịch Bản Phim & Phỏng Vấn (AI Scriptwriter)</div>
+                <div class="card-sub">Nhập ý tưởng thô — Muse Spark sẽ tự dựng kịch bản 4 cảnh lầy lội, đối đáp hài hước, phân cảnh chi tiết.</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Chọn Thể Loại Kịch Bản:</label>
+              <div id="scriptFormatsContainer" class="preset-chips">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Ý Tưởng Video Của Bạn (Raw Prompt):</label>
+              <textarea id="scriptUserIdea" class="textarea" style="height: 110px;" placeholder="Ví dụ: kol vẻ mặt hài hước đi phỏng vấn người dân giữa đường ngập nước sau đêm mưa rất lớn tối nay..."></textarea>
+              <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px;">
+                <span class="preset-chip" style="font-size: 11px; padding: 4px 8px; cursor: pointer;" onclick="applyIdeaSuggestion('kol vẻ mặt hài hước đi phỏng vấn người dân giữa đường ngập nước sau đêm mưa rất lớn tối nay')">💡 Phỏng vấn đường ngập</span>
+                <span class="preset-chip" style="font-size: 11px; padding: 4px 8px; cursor: pointer;" onclick="applyIdeaSuggestion('kol xinh đẹp cầm mic đồ chơi đi hỏi người đi đường xin quá giang xe máy giờ tan tầm kẹt xe')">💡 Xin quá giang xe máy</span>
+                <span class="preset-chip" style="font-size: 11px; padding: 4px 8px; cursor: pointer;" onclick="applyIdeaSuggestion('kol làm phục vụ quán phở ngày đầu tiên lóng ngóng làm rơi đũa nhưng đối đáp khách cực duyên')">💡 Ngày đầu phụ quán phở</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Gia vị / Tông giọng bổ sung (Tùy chọn):</label>
+              <input type="text" id="scriptExtraTone" class="input-text" placeholder="Ví dụ: Hài hước lầy lội, đối đáp bá đạo, nhiều tiếng lóng Gen Z..." value="Hài hước, lầy lội, dí dỏm, đối đáp cười ra nước mắt, tự nhiên đời thường" />
+            </div>
+
+            <button id="btnGenScript" class="btn btn-primary btn-block" onclick="generateScript()">
+              ⚡ Dựng Kịch Bản Phim Triệu View (Muse Spark)
+            </button>
+          </div>
+        </div>
+
+        <div class="col-7">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">📜 Kịch Bản Chi Tiết & Phân Cảnh</div>
+                <div class="card-sub">Kịch bản hoàn chỉnh kèm lời thoại đối đáp và prompt ảnh cảnh quay.</div>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" onclick="copyFullScript()">📋 Sao Chép</button>
+                <button class="btn btn-secondary btn-sm" onclick="sendScriptToLookbook()" title="Nạp prompt cảnh vào Lookbook Studio">📸 Gửi Sang Lookbook</button>
+                <button class="btn btn-primary btn-sm" onclick="sendScriptToVoice()" title="Nạp lời thoại vào Phòng Thu Voice">🎙️ Gửi Sang Phòng Thu</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <textarea id="scriptResultBox" class="textarea" style="height: 480px; font-size: 13px; line-height: 1.6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #000; color: #f4f4f5;" placeholder="Nhập ý tưởng bên trái và bấm 'Dựng Kịch Bản Phim' để Muse Spark bắt đầu sáng tạo..."></textarea>
+            </div>
+
+            <div id="scriptActionBadges" style="display: none; margin-top: 12px; background: rgba(236,72,153,0.06); border: 1px solid rgba(236,72,153,0.2); border-radius: var(--radius-sm); padding: 12px; font-size: 12px;">
+              <div style="font-weight: 600; color: var(--accent-pink); margin-bottom: 6px;">🚀 Phím tắt quy trình sản xuất (1-Click Pipeline):</div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" onclick="sendScriptToLookbook()">📸 Bước tiếp theo: Tạo ảnh Lookbook cảnh này</button>
+                <button class="btn btn-primary btn-sm" onclick="sendScriptToVoice()">🎙️ Bước tiếp theo: Thu âm lời thoại KOL</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: XƯỞNG CHỤP LOOKBOOK ==================== -->
     <section id="tab-lookbook" class="tab-content">
       <div class="bento-grid">
         <div class="col-5">
@@ -1150,6 +1221,10 @@
     let selectedSceneId = null;
     let selectedMotionId = null;
     let selectedStyleId = null;
+    let selectedScriptFormatId = null;
+
+    let currentScriptLookbookPrompt = '';
+    let currentScriptVoiceText = '';
 
     let currentGeneratedImageUrl = null;
     let currentGeneratedVideoUrl = null;
@@ -1258,6 +1333,24 @@
         capWrap.appendChild(d);
         if (i === 0) selectedStyleId = s.id;
       });
+
+      // Script formats
+      const sfWrap = document.getElementById('scriptFormatsContainer');
+      if (sfWrap) {
+        sfWrap.innerHTML = '';
+        (PRESETS.script_formats || []).forEach((sf, i) => {
+          const d = document.createElement('div');
+          d.className = 'preset-chip' + (i === 0 ? ' active' : '');
+          d.innerHTML = `<span>${sf.name}</span>`;
+          d.onclick = () => {
+            document.querySelectorAll('#scriptFormatsContainer .preset-chip').forEach(c => c.classList.remove('active'));
+            d.classList.add('active');
+            selectedScriptFormatId = sf.id;
+          };
+          sfWrap.appendChild(d);
+          if (i === 0) selectedScriptFormatId = sf.id;
+        });
+      }
     }
 
     // Render Profiles in Selector & Cards
@@ -1685,6 +1778,101 @@
         btn.disabled = false;
         btn.textContent = '🎬 1-Click Hợp Nhất Video & Âm Thanh (FFmpeg)';
       }
+    }
+
+    // ================= Scriptwriting (Phim & Phỏng Vấn Hài Hước) =================
+    function applyIdeaSuggestion(text) {
+      const el = document.getElementById('scriptUserIdea');
+      el.value = text;
+      el.focus();
+    }
+
+    async function generateScript() {
+      if (!ACTIVE_KOL) return toast('Vui lòng chọn bé KOL', 'err');
+      const idea = document.getElementById('scriptUserIdea').value.trim();
+      if (!idea) return toast('Vui lòng nhập ý tưởng kịch bản', 'err');
+
+      const btn = document.getElementById('btnGenScript');
+      btn.disabled = true;
+      btn.textContent = 'Muse Spark đang dựng kịch bản 4 cảnh...';
+
+      const payload = {
+        profile_id: ACTIVE_KOL.id,
+        user_idea: idea,
+        format_id: selectedScriptFormatId || 'street_interview',
+        extra_tone: document.getElementById('scriptExtraTone').value.trim()
+      };
+
+      try {
+        const res = await fetch('/kol/api/generate-script', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        }).then(r => r.json());
+
+        if (res.script) {
+          document.getElementById('scriptResultBox').value = res.script;
+          currentScriptLookbookPrompt = res.lookbook_prompt || '';
+          currentScriptVoiceText = res.voice_text || '';
+          document.getElementById('scriptActionBadges').style.display = 'block';
+          toast('Đã dựng xong kịch bản phim hài hước!', 'ok');
+        } else {
+          throw new Error(res.detail || 'Không dựng được kịch bản');
+        }
+      } catch (e) {
+        toast('Lỗi dựng kịch bản: ' + e.message, 'err');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '⚡ Dựng Kịch Bản Phim Triệu View (Muse Spark)';
+      }
+    }
+
+    function copyFullScript() {
+      const text = document.getElementById('scriptResultBox').value;
+      if (!text) return toast('Chưa có kịch bản để sao chép', 'err');
+      navigator.clipboard.writeText(text);
+      toast('Đã sao chép toàn bộ kịch bản vào clipboard!', 'ok');
+    }
+
+    function sendScriptToLookbook() {
+      const text = document.getElementById('scriptResultBox').value;
+      if (!text && !currentScriptLookbookPrompt) return toast('Chưa có kịch bản', 'err');
+      
+      let p = currentScriptLookbookPrompt;
+      if (!p && text) {
+        const m1 = text.match(/(?:###\s*)?📸\s*LOOKBOOK PROMPT CHÍNH[^\n]*\n+([\s\S]*?)(?=(?:\n+(?:###\s*)?[📸🎙️📱])|\Z)/i);
+        if (m1) p = m1[1].trim();
+      }
+      if (!p && text) {
+        const m2 = text.match(/📸\s*Lookbook Prompt \(English\):\s*`?([^\n`]+)`?/i);
+        if (m2) p = m2[1].trim();
+      }
+      if (!p) {
+        p = `funny street interview situation, photorealistic 8k, ultra-sharp detail`;
+      }
+
+      document.getElementById('customLookbookPrompt').value = p;
+      showTab('tab-lookbook');
+      toast('Đã nạp prompt cảnh kịch bản sang Lookbook Studio!', 'ok');
+    }
+
+    function sendScriptToVoice() {
+      const text = document.getElementById('scriptResultBox').value;
+      if (!text && !currentScriptVoiceText) return toast('Chưa có kịch bản', 'err');
+
+      let v = currentScriptVoiceText;
+      if (!v && text) {
+        const m1 = text.match(/(?:###\s*)?🎙️\s*TOÀN BỘ LỜI THOẠI LỒNG TIẾNG[^\n]*\n+([\s\S]*?)(?=(?:\n+(?:###\s*)?[📸🎙️📱])|\Z)/i);
+        if (m1) v = m1[1].trim();
+      }
+      if (!v && text) {
+        const clean = text.replace(/#\w+/g, '').replace(/[🌸✨💖☕🏖️💃🎬]/g, '').trim();
+        v = clean.slice(0, 300);
+      }
+
+      document.getElementById('voiceText').value = v;
+      showTab('tab-voice');
+      toast('Đã chuyển lời thoại kịch bản sang Phòng Thu Voice!', 'ok');
     }
 
     // ================= Caption Generation =================

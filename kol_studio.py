@@ -55,7 +55,7 @@ def _load_presets() -> dict:
                 return json.load(f)
         except Exception as e:
             log.warning("Failed to load presets: %s", e)
-    return {"characters": [], "lookbook_scenes": [], "motion_presets": [], "voices": [], "caption_styles": []}
+    return {"characters": [], "lookbook_scenes": [], "motion_presets": [], "voices": [], "caption_styles": [], "script_formats": []}
 
 
 def _load_profiles() -> list[dict]:
@@ -131,6 +131,13 @@ class CaptionReq(BaseModel):
     style_id: str
     topic: Optional[str] = ""
     scene_name: Optional[str] = ""
+
+
+class ScriptReq(BaseModel):
+    profile_id: str
+    user_idea: str
+    format_id: Optional[str] = "street_interview"
+    extra_tone: Optional[str] = ""
 
 
 # ===================== Endpoints =====================
@@ -527,6 +534,148 @@ Hãy viết hoàn toàn bằng tiếng Việt tự nhiên, có duyên, không s�
     except Exception as exc:
         log.exception("[KOL] Caption generation error: %s", exc)
         raise HTTPException(500, f"Tạo caption thất bại: {exc}") from exc
+
+
+@router.post("/generate-script")
+async def generate_script(req: ScriptReq):
+    """Uses muse-spark via safe_chat_stream to generate full viral short video scripts with scenes, dialogues, lookbook prompt, and voiceover text."""
+    from app import CFG, safe_chat_stream, store
+
+    profiles = _load_profiles()
+    profile = next((p for p in profiles if p["id"] == req.profile_id), None)
+    if not profile:
+        raise HTTPException(404, "Không tìm thấy hồ sơ KOL")
+
+    presets = _load_presets()
+    formats = {f["id"]: f for f in presets.get("script_formats", [])}
+    fmt = formats.get(req.format_id, {
+        "name": "Phỏng vấn đường phố hài hước",
+        "desc": "KOL cầm micro hoặc đạo cụ phỏng vấn người dân tại hiện trường với các câu hỏi bất ngờ, đối đáp hài hước."
+    })
+
+    idea = req.user_idea.strip()
+    if not idea:
+        raise HTTPException(400, "Vui lòng nhập ý tưởng kịch bản")
+
+    extra_tone = req.extra_tone.strip() or "Hài hước, dí dỏm, biểu cảm phong phú, dùng tiếng lóng tự nhiên đời thường của giới trẻ Việt Nam"
+    dna_summary = profile.get("dna_prompt", "")[:220]
+
+    sys_prompt = f"""Bạn là Đạo diễn kiêm Biên kịch hàng đầu cho các kênh TikTok/Reels triệu view của các Virtual KOL (KOL Ảo).
+Nhân vật chính của kịch bản là bé KOL tên: {profile['name']} ({profile.get('age', 21)} tuổi, {profile.get('archetype', 'Nàng thơ')}, quốc tịch {profile.get('nationality', 'Việt Nam')}).
+Tính cách nhân vật: {profile.get('personality_tone') or 'Hài hước, duyên dáng, gần gũi'}
+DNA ngoại hình của {profile['name']}: {dna_summary}
+
+Thể loại video: {fmt['name']} ({fmt['desc']})
+Ý tưởng kịch bản từ người dùng: "{idea}"
+Yêu cầu phong cách bổ sung: {extra_tone}
+
+HÃY DỰNG MỘT KỊCH BẢN VIDEO VIRAL HOÀN CHỈNH (thời lượng 30s - 60s, chia làm 4 cảnh) theo ĐÚNG cấu trúc sau:
+
+# 🎬 KỊCH BẢN: [Đặt tiêu đề giật tít, siêu bắt tai, hài hước]
+**Nhân vật chính:** {profile['name']}
+**Thể loại:** {fmt['name']}
+**Bối cảnh:** [Mô tả ngắn gọn không gian hiện trường]
+**Hook 3 giây đầu:** [Câu nói hoặc hành động bất ngờ mở màn giật spotlight ngay lập tức]
+
+---
+
+### 🎭 PHÂN CẢNH CHI TIẾT
+
+#### 🎬 CẢNH 1: Mở Màn - Hiện Trường & Cú Hook (3-5s)
+- **Hành động & Biểu cảm KOL:** [Mô tả cụ thể nét mặt hài hước, cử chỉ lầy lội, đạo cụ cầm trên tay]
+- **Lời thoại KOL:** "[Lời thoại mở màn hài hước chào khán giả]"
+- **📸 Lookbook Prompt (English):** [1 câu prompt tiếng Anh chi tiết để tạo ảnh bìa/ảnh cảnh 1 chất lượng photorealistic 8k, gắn với {profile['name']}, bối cảnh hiện trường, biểu cảm hài hước, không chứa chữ]
+- **🎙️ Voiceover (Cảnh 1):** [Lời thoại ngắn]
+
+#### 🎬 CẢNH 2: Phỏng Vấn Người Dân 1 / Tình Huống Éo Le Thứ Nhất (5-8s)
+- **Nhân vật tương tác:** [Mô tả người dân được phỏng vấn, trang phục, dáng vẻ ngộ nghĩnh]
+- **Hành động:** [KOL tiến lại gần, biểu cảm dở khóc dở cười]
+- **Đối thoại Phỏng vấn (Hài hước khó đỡ):**
+  - **{profile['name']}:** "[Câu hỏi phỏng vấn bất ngờ, lầy lội]"
+  - **Người dân:** "[Câu trả lời thật thà ngô nghê hoặc 'bá đạo' khiến ai nghe cũng bật cười]"
+- **📸 Lookbook Prompt (English):** [Prompt tiếng Anh mô tả cảnh tương tác này]
+
+#### 🎬 CẢNH 3: Phỏng Vấn Người Dân 2 / Tình Huống Cao Trào (5-8s)
+- **Nhân vật tương tác:** [Nhân vật thứ 2 cá tính hoặc tình huống bất ngờ ập tới]
+- **Hành động:** [Pha xử lý hài hước không đụng hàng]
+- **Đối thoại Phỏng vấn (Cười ra nước mắt):**
+  - **{profile['name']}:** "[Câu hỏi hoặc nhận xét hài hước]"
+  - **Người dân:** "[Pha đối đáp lầy lội, chốt hạ ấn tượng]"
+- **📸 Lookbook Prompt (English):** [Prompt tiếng Anh mô tả cảnh này]
+
+#### 🎬 CẢNH 4: Pha Chốt Hạ & Kêu Gọi Tương Tác (Outro) (3-5s)
+- **Hành động & Biểu cảm KOL:** [Biểu cảm 'bất lực' hài hước hoặc tạo dáng dễ thương chào tạm biệt]
+- **Lời thoại kết:** "[Câu chốt duyên dáng, hỏi ý kiến khán giả và kêu gọi follow]"
+- **🎙️ Voiceover (Cảnh 4):** [Lời thoại kết]
+
+---
+
+### 🎙️ TOÀN BỘ LỜI THOẠI LỒNG TIẾNG (EDGE-TTS READY)
+[Viết liền mạch toàn bộ các câu nói của {profile['name']} từ Cảnh 1 đến Cảnh 4 để người dùng copy trực tiếp vào Phòng Thu Voice Studio tạo giọng đọc liền một mạch]
+
+---
+
+### 📸 LOOKBOOK PROMPT CHÍNH (LOOKBOOK STUDIO READY)
+[Viết 1 đoạn prompt tiếng Anh hoàn chỉnh kết hợp DNA ngoại hình của {profile['name']} và bối cảnh đắt giá nhất của clip, chuẩn bị sẵn sàng để paste vào Xưởng Chụp Lookbook Studio tạo ảnh 8K]
+
+---
+
+### 📱 STATUS & HASHTAG ĐĂNG MẠNG XÃ HỘI
+[Viết 1 status ngắn gọn cực hút kèm 6-8 hashtag thịnh hành TikTok/Facebook/Reels]
+
+Hãy viết với lời thoại tự nhiên nhất, dùng từ ngữ đời sống phong phú, hài hước hóm hỉnh, tuyệt đối không giáo điều sáo rỗng!"""
+
+    acc = store.pick_account(rotate=True)
+    if not acc:
+        raise HTTPException(400, "Chưa có tài khoản Muse nào khả dụng trong hệ thống")
+
+    acc_id = acc["id"]
+    cookies = acc["cookies"]
+    expires = acc.get("cookies_exp")
+    timeout = int(CFG.chat_timeout or 120)
+
+    try:
+        def run_chat():
+            return "".join(safe_chat_stream(cookies, sys_prompt, expires, timeout, account_id=acc_id))
+        full_text = await asyncio.to_thread(run_chat)
+
+        import re
+        extracted_lookbook = ""
+        lb_match = re.search(r"(?:###\s*)?📸\s*LOOKBOOK PROMPT CHÍNH[^\n]*\n+([\s\S]*?)(?=(?:\n+(?:###\s*)?[📸🎙️📱])|\Z)", full_text, re.IGNORECASE)
+        if lb_match:
+            extracted_lookbook = lb_match.group(1).strip("` \n\r")
+        if not extracted_lookbook:
+            sc_match = re.search(r"📸\s*Lookbook Prompt \(English\):\s*`?([^\n`]+)`?", full_text, re.IGNORECASE)
+            if sc_match:
+                extracted_lookbook = sc_match.group(1).strip()
+        if not extracted_lookbook:
+            extracted_lookbook = f"{profile.get('dna_prompt', '')}, funny street moment, {idea}, photorealistic 8k"
+
+        extracted_voice = ""
+        vc_match = re.search(r"(?:###\s*)?🎙️\s*TOÀN BỘ LỜI THOẠI LỒNG TIẾNG[^\n]*\n+([\s\S]*?)(?=(?:\n+(?:###\s*)?[📸🎙️📱])|\Z)", full_text, re.IGNORECASE)
+        if vc_match:
+            extracted_voice = vc_match.group(1).strip("` \n\r")
+        if not extracted_voice:
+            dial_matches = re.findall(rf"(?:{re.escape(profile['name'])}|KOL):\s*\"([^\"]+)\"", full_text)
+            if dial_matches:
+                # Deduplicate consecutive duplicates
+                dedup = []
+                for d in dial_matches:
+                    if not dedup or dedup[-1] != d:
+                        dedup.append(d)
+                extracted_voice = " ".join(dedup)
+
+        return {
+            "status": "ok",
+            "script": full_text,
+            "character": profile["name"],
+            "format": fmt["name"],
+            "lookbook_prompt": extracted_lookbook,
+            "voice_text": extracted_voice,
+        }
+    except Exception as exc:
+        log.exception("[KOL] Script generation error: %s", exc)
+        raise HTTPException(500, f"Dựng kịch bản thất bại: {exc}") from exc
 
 
 @router.get("/gallery/{profile_id}")

@@ -239,5 +239,28 @@
       "name": "Kịch bản Video ngắn 15s (Hook + Body + CTA)",
       "desc": "Kịch bản chuẩn cấu trúc video ngắn giữ chân người xem từ 3 giây đầu tiên."
     }
+  ],
+  "script_formats": [
+    {
+      "id": "street_interview",
+      "name": "Phỏng vấn đường phố hài hước / Lầy lội",
+      "desc": "KOL cầm micro hoặc đạo cụ lạ phỏng vấn người dân tại hiện trường với các câu hỏi bất ngờ, đối đáp hài hước."
+    },
+    {
+      "id": "comedy_situation",
+      "name": "Tình huống trớ trêu / Cười ra nước mắt",
+      "desc": "KOL rơi vào hoàn cảnh éo le (ngập nước, kẹt xe, trễ hẹn, đồ ăn lạ) và tự giải quyết theo cách khó đỡ."
+    },
+    {
+      "id": "street_vlog",
+      "name": "Vlog trải nghiệm đường phố hóm hỉnh",
+      "desc": "Khám phá đời thực, trải nghiệm hiện tượng đời sống thường nhật một cách tự nhiên và duyên dáng."
+    },
+    {
+      "id": "social_prank",
+      "name": "Thử thách hài hước / Troll nhẹ nhàng",
+      "desc": "Thử thách người đi đường hoặc nhờ vả những việc khó nhằn với phản ứng bất ngờ."
+    }
   ]
 }
+
