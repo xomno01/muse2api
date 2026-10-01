@@ -51,24 +51,26 @@
 
 ## 🚀 极速部署
 
-### 🇻🇳 Khởi Chạy 1-Click Trên Windows (Dành Cho Máy Phụ)
+### 🇻🇳 Khởi Chạy 1-Click Trên Windows & MuseKOL Studio
 
 Bản build này đã được tích hợp sẵn:
-- **Giao diện Tiếng Việt 100%** (kèm nút chuyển đổi nhanh `[ 🇻🇳 Tiếng Việt | 🇨🇳 中文 ]` cả trên Web Admin và Chrome Extension).
+- **✨ MuseKOL Studio (`/kol`)**: Bộ công cụ chuyên nghiệp tạo & sản xuất nội dung cho **KOL ảo (AI Influencer)** gồm:
+  - 🎭 Quản lý DNA nhân vật & Face Anchor giữ nguyên khuôn mặt qua mọi bộ ảnh.
+  - 📸 Xưởng chụp Lookbook đa bối cảnh (Cafe, Ban công hoàng hôn, Streetwear, Dạ hội, Bãi biển, Áo dài sen...).
+  - 🎬 Dựng video cử động 5s - 10s tự nhiên bằng công nghệ Image-to-Video của Muse.
+  - 🎙️ Lồng tiếng AI tiếng Việt truyền cảm (Edge-TTS Hoài My / Nam Minh) & Tự động ghép Video + Âm thanh bằng FFmpeg.
+  - ✍️ Bộ não soạn thảo Caption thả thính & Kịch bản TikTok viral bằng `muse-spark`.
+- **Giao diện Tiếng Việt 100%** (kèm nút toggle `[ 🇻🇳 Tiếng Việt | 🇨🇳 中文 ]`).
 - **Đầy đủ cấu hình & Cookie**: Đã đóng gói sẵn `.env` và `data/accounts.json` nên khi clone về máy phụ là chạy được ngay.
-- **Script chạy tự động 1-click**:
 
 1. **Clone repo về máy phụ**:
    ```bash
    git clone https://github.com/xomno01/muse2api.git
    cd muse2api
    ```
-2. **Chạy ngay**:
-   - Nhấp đúp chuột vào file `run.bat` (hoặc gõ `.\run.ps1` trong PowerShell).
-   - Script sẽ tự động kiểm tra Python, tạo Virtualenv (`.venv`), cài thư viện `requirements.txt`, bật UTF-8 và khởi chạy máy chủ.
-3. **Mở trang quản trị**:
-   - Truy cập: `http://127.0.0.1:18610/admin?key=m2a_admin_8888888888`
-   - Tài khoản và Cookie đã sẵn sàng sử dụng ngay!
+2. **Khởi chạy cực nhanh**:
+   - Để mở **MuseKOL Studio**: Nhấp đúp chuột vào file **`run_kol.bat`** (hoặc `.\run_kol.ps1`) -> Tự động bật trình duyệt vào `http://127.0.0.1:18610/kol`.
+   - Để mở **Quản trị API Admin**: Nhấp đúp chuột vào file **`run.bat`** (hoặc `.\run.ps1`) -> Truy cập `http://127.0.0.1:18610/admin?key=m2a_admin_8888888888`.
 
 ---
 

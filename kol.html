@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MuseKOL Studio — Xưởng Sản Xuất KOL Ảo Chuyên Nghiệp</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+  <style>
+    :root {
+      --bg: #09090b;
+      --surface: #12131a;
+      --surface-card: #181924;
+      --surface-hover: #222433;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-focus: rgba(236, 72, 153, 0.4);
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --primary: #ec4899;
+      --primary-hover: #f43f5e;
+      --primary-gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+      --accent-violet: #8b5cf6;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --badge-bg: rgba(236, 72, 153, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.5;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Aurora Glow */
+    .glow-aura {
+      position: fixed;
+      top: -150px;
+      left: 30%;
+      width: 600px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(139, 92, 246, 0.08) 50%, transparent 70%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
+    }
+    .brand-title {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 40%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .kol-selector-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+    }
+    .kol-selector-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    select.kol-select {
+      background: transparent;
+      color: #fff;
+      border: none;
+      outline: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    select.kol-select option {
+      background: var(--surface-card);
+      color: #fff;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .status-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    /* Tabs Bar */
+    .tabs-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+      overflow-x: auto;
+    }
+    .tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .tab-btn:hover {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .tab-btn.active {
+      color: #fff;
+      background: rgba(236, 72, 153, 0.14);
+      border-color: rgba(236, 72, 153, 0.35);
+      font-weight: 600;
+    }
+
+    /* Main Container */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.25s ease forwards;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Bento Grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+    }
+    .col-4 { grid-column: span 4; }
+    .col-5 { grid-column: span 5; }
+    .col-6 { grid-column: span 6; }
+    .col-7 { grid-column: span 7; }
+    .col-8 { grid-column: span 8; }
+    .col-12 { grid-column: span 12; }
+
+    @media (max-width: 1024px) {
+      .col-4, .col-5, .col-6, .col-7, .col-8 { grid-column: span 12; }
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Forms & Inputs */
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .input-text, .textarea, .select {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 13px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+    .input-text:focus, .textarea:focus, .select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2);
+    }
+    .textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.4;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--primary-gradient);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+    }
+    .btn-primary:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+    .btn-block {
+      width: 100%;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Preset Selection Chips */
+    .preset-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 4px 0;
+    }
+    .preset-chip {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .preset-chip:hover {
+      border-color: rgba(236, 72, 153, 0.4);
+      background: var(--surface-hover);
+    }
+    .preset-chip.active {
+      border-color: var(--primary);
+      background: rgba(236, 72, 153, 0.15);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Image / Video Viewer Box */
+    .media-box {
+      width: 100%;
+      height: 480px;
+      background: #000;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+    }
+    .media-box img, .media-box video {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .media-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .media-placeholder svg {
+      width: 48px;
+      height: 48px;
+      opacity: 0.35;
+    }
+
+    /* Progress Overlay */
+    .progress-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      z-index: 10;
+    }
+    .progress-bar-wrap {
+      width: 220px;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 20%;
+      background: var(--primary-gradient);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+    .progress-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* KOL Cards List */
+    .kol-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .kol-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .kol-card:hover {
+      border-color: rgba(236, 72, 153, 0.5);
+      transform: translateY(-2px);
+    }
+    .kol-card.selected {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.25);
+      background: rgba(236, 72, 153, 0.05);
+    }
+    .kol-card-top {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    .kol-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--surface-card);
+      border: 2px solid var(--primary);
+    }
+    .kol-avatar-ph {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: var(--surface-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border: 2px solid var(--line);
+    }
+    .kol-meta {
+      flex: 1;
+    }
+    .kol-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .kol-tagline {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .kol-dna-snippet {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 10px;
+      background: var(--surface-card);
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: var(--surface-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 640px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #181924;
+      border: 1px solid var(--line);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      z-index: 999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    #toast.success { border-color: #10b981; }
+    #toast.error { border-color: #ef4444; }
+
+    /* Gallery Grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .gallery-item {
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      aspect-ratio: 1;
+    }
+    .gallery-item:hover {
+      border-color: var(--primary);
+    }
+    .gallery-item img, .gallery-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .gallery-tag {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      background: rgba(0,0,0,0.7);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-aura"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">✨</div>
+      <div>
+        <div class="brand-title">MuseKOL Studio</div>
+        <div class="brand-sub">Xưởng Sản Xuất KOL Ảo Toàn Diện</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <div class="kol-selector-wrap">
+        <span class="kol-selector-label">Đang làm việc với:</span>
+        <select id="activeKolSelect" class="kol-select" onchange="switchActiveKol(this.value)">
+          <option value="">(Chưa có hồ sơ)</option>
+        </select>
+      </div>
+
+      <div class="status-badge">
+        <div class="dot"></div>
+        <span>Muse Engine Sẵn Sàng</span>
+      </div>
+
+      <a href="/admin" target="_blank" class="btn btn-secondary btn-sm">⚙️ Quản trị Tài khoản</a>
+    </div>
+  </header>
+
+  <!-- Tabs Navigation -->
+  <nav class="tabs-bar">
+    <button class="tab-btn active" onclick="showTab('tab-char')">🎭 Nhân Vật & DNA</button>
+    <button class="tab-btn" onclick="showTab('tab-lookbook')">📸 Xưởng Chụp Lookbook</button>
+    <button class="tab-btn" onclick="showTab('tab-motion')">🎬 Dựng Video Chuyển Động</button>
+    <button class="tab-btn" onclick="showTab('tab-voice')">🎙️ Phòng Thu & Ghép Voice</button>
+    <button class="tab-btn" onclick="showTab('tab-social')">✍️ Soạn Thảo Caption AI</button>
+    <button class="tab-btn" onclick="showTab('tab-vault')">📂 Kho Thành Phẩm</button>
+  </nav>
+
+  <!-- Main Container -->
+  <main>
+
+    <!-- ==================== TAB 1: NHÂN VẬT & DNA ==================== -->
+    <section id="tab-char" class="tab-content active">
+      <div class="bento-grid">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🎭 Danh Sách KOL Ảo Của Bạn</div>
+                <div class="card-sub">Quản lý gương mặt đại diện (Face Anchor) và DNA nhận diện để giữ sự nhất quán 100% qua mọi bộ ảnh và video.</div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="openNewKolModal()">+ Thêm KOL Mới</button>
+            </div>
+
+            <div id="kolCardsContainer" class="kol-cards-grid">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="col-5">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🎯 Neo Khuôn Mặt (Face Anchor)</div>
+                <div class="card-sub">Bức ảnh chân dung gốc dùng làm "mẫu tham chiếu" cho mọi bức ảnh sau.</div>
+              </div>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 16px;">
+              <div id="anchorPreviewBox" style="width: 180px; height: 180px; border-radius: 50%; border: 3px solid var(--primary); margin: 0 auto; overflow: hidden; background: var(--surface); display: flex; align-items: center; justify-content: center;">
+                <span id="anchorPlaceholderText" style="color: var(--text-muted); font-size: 12px;">Chưa đặt Face Anchor</span>
+                <img id="anchorPreviewImg" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tải ảnh chân dung mẫu lên (PNG/JPG/WebP):</label>
+              <input type="file" id="anchorFileInput" class="input-text" accept="image/*" onchange="uploadFaceAnchor(this.files[0])" />
+            </div>
+
+            <div class="form-group" style="margin-top: 10px;">
+              <button class="btn btn-secondary btn-block" onclick="generateFaceAnchorFromDna()">✨ Tự động sinh Face Anchor từ DNA bằng Muse</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-7">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🧬 DNA Chi Tiết & Nhân Cách</div>
+                <div class="card-sub">Thông số nhận dạng sinh học cố định của nhân vật đang chọn.</div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="editCurrentKol()">Chỉnh Sửa</button>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">DNA Prompt Cốt Lõi (Khuôn mặt, màu mắt, kiểu tóc, nét đặc trưng):</label>
+              <textarea id="viewDnaPrompt" class="textarea" readonly style="font-family: monospace; font-size: 12px;"></textarea>
+            </div>
+
+            <div class="bento-grid" style="gap: 12px;">
+              <div class="col-6">
+                <div class="form-label">Phong cách:</div>
+                <div id="viewArchetype" style="font-weight: 600; color: #fff;">-</div>
+              </div>
+              <div class="col-6">
+                <div class="form-label">Giọng đọc ưa thích:</div>
+                <div id="viewVoice" style="font-weight: 600; color: var(--accent-cyan);">-</div>
+              </div>
+              <div class="col-12">
+                <div class="form-label">Tiểu sử & Tính cách:</div>
+                <div id="viewBio" style="font-size: 13px; color: var(--text-muted); line-height: 1.4;">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: XƯỞNG CHỤP LOOKBOOK ==================== -->
+    <section id="tab-lookbook" class="tab-content">
+      <div class="bento-grid">
+        <div class="col-5">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">📸 Thiết Lập Chụp Ảnh Lookbook</div>
+                <div class="card-sub">Kết hợp DNA của bé KOL với các bối cảnh đời thường & thời trang.</div>
+              </div>
+            </div>
+
+            <div class="form-group" style="background: rgba(236,72,153,0.08); padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(236,72,153,0.25);">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                <input type="checkbox" id="chkUseAnchor" checked style="accent-color: var(--primary);" />
+                <span>Khóa Face Anchor (Giữ nguyên gương mặt bé KOL)</span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Chọn Bối Cảnh Có Sẵn (Preset 1-Click):</label>
+              <div id="scenesContainer" class="preset-chips">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Yêu cầu bổ sung thêm (Trang phục, biểu cảm, chi tiết tùy chọn):</label>
+              <textarea id="customLookbookPrompt" class="textarea" placeholder="Ví dụ: Đang cười rạng rỡ, tay cầm túi xách màu kem, ánh mắt nhìn thẳng camera..."></textarea>
+            </div>
+
+            <div class="bento-grid" style="gap: 10px; margin-bottom: 14px;">
+              <div class="col-6">
+                <label class="form-label">Tỷ lệ khung hình:</label>
+                <select id="lookbookRatio" class="select">
+                  <option value="1:1" selected>1:1 (Instagram Feed / Vuông)</option>
+                  <option value="9:16">9:16 (TikTok / Story / Dọc)</option>
+                  <option value="3:4">3:4 (Lookbook Thời trang)</option>
+                  <option value="16:9">16:9 (YouTube / Ảnh bìa ngang)</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Bộ lọc sạch:</label>
+                <input type="text" class="input-text" value="Xóa chữ, logo, watermark 100%" readonly />
+              </div>
+            </div>
+
+            <button id="btnGenImage" class="btn btn-primary btn-block" onclick="generateLookbookImage()">
+              📸 Bấm Máy Chụp Ảnh (Generate)
+            </button>
+          </div>
+        </div>
+
+        <div class="col-7">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🖼️ Khung Hình Thành Phẩm</div>
+                <div class="card-sub">Ảnh mới sinh sẽ hiển thị tại đây ở độ phân giải tối đa.</div>
+              </div>
+              <div id="imageActionBtns" style="display: none; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" onclick="setAsAnchorFromGen()">🎯 Đặt Làm Anchor</button>
+                <button class="btn btn-secondary btn-sm" onclick="sendToMotionLab()">🎬 Đưa Sang Dựng Video</button>
+                <a id="btnDownloadImg" href="" download class="btn btn-primary btn-sm">⬇️ Tải Ảnh</a>
+              </div>
+            </div>
+
+            <div class="media-box" id="imageResultBox">
+              <div id="imgProgress" class="progress-overlay" style="display: none;">
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill" style="width: 60%; animation: pulse 1s infinite alternate;"></div>
+                </div>
+                <div class="progress-text">Đang kết nối Muse để vẽ ảnh nghệ thuật… (khoảng 15-25s)</div>
+              </div>
+
+              <div id="imagePlaceholder" class="media-placeholder">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                <span>Chưa có ảnh nào được tạo. Hãy chọn bối cảnh và bấm "Bấm Máy Chụp Ảnh".</span>
+              </div>
+
+              <img id="generatedImage" src="" style="display: none;" />
+            </div>
+
+            <div id="imagePromptUsedBox" style="margin-top: 12px; font-size: 11px; color: var(--text-muted); background: var(--surface); padding: 8px; border-radius: var(--radius-sm); display: none;">
+              <b>Prompt đã gửi:</b> <span id="imagePromptUsedText"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: DỰNG VIDEO CHUYỂN ĐỘNG ==================== -->
+    <section id="tab-motion" class="tab-content">
+      <div class="bento-grid">
+        <div class="col-5">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🎬 Cấu Hình Dựng Video (Image-to-Video)</div>
+                <div class="card-sub">Thổi hồn cho bức ảnh tĩnh của bé KOL chuyển động thành clip ngắn 5s - 10s.</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Ảnh Khung Hình Đầu (First Frame):</label>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <div style="width: 64px; height: 64px; border-radius: var(--radius-sm); overflow: hidden; background: #000; border: 1px solid var(--line); flex-shrink: 0;">
+                  <img id="motionSourceImgThumb" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+                  <span id="motionNoImgHint" style="font-size: 10px; color: var(--text-muted); display: block; text-align: center; margin-top: 20px;">Trống</span>
+                </div>
+                <div style="flex: 1;">
+                  <input type="text" id="motionSourceImgUrl" class="input-text" placeholder="URL ảnh hoặc chọn từ Lookbook" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Chọn Kịch Bản Chuyển Động (Motion Preset):</label>
+              <div id="motionPresetsContainer" class="preset-chips">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Mô tả cử động tùy biến (Tùy chọn):</label>
+              <textarea id="customMotionPrompt" class="textarea" placeholder="Ví dụ: Chớp mắt nhẹ, làn gió làm bay tà áo, mỉm cười nhìn vào ống kính..."></textarea>
+            </div>
+
+            <div class="bento-grid" style="gap: 10px; margin-bottom: 14px;">
+              <div class="col-6">
+                <label class="form-label">Thời lượng:</label>
+                <select id="videoDuration" class="select">
+                  <option value="5" selected>5 Giây (Chuẩn mượt)</option>
+                  <option value="8">8 Giây</option>
+                  <option value="10">10 Giây</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Khổ Video:</label>
+                <select id="videoAspect" class="select">
+                  <option value="9:16" selected>9:16 (Dọc TikTok/Reels)</option>
+                  <option value="16:9">16:9 (Ngang YouTube)</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="btnGenVideo" class="btn btn-primary btn-block" onclick="generateMotionVideo()">
+              🎬 Bắt Đầu Dựng Video (Generate)
+            </button>
+          </div>
+        </div>
+
+        <div class="col-7">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">📺 Màn Chiếu Video Thành Phẩm</div>
+                <div class="card-sub">Video MP4 render từ Muse sẽ phát trực tiếp tại đây.</div>
+              </div>
+              <div id="videoActionBtns" style="display: none; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" onclick="sendToVoiceLab()">🎙️ Đưa Sang Ghép Tiếng</button>
+                <a id="btnDownloadVid" href="" download class="btn btn-primary btn-sm">⬇️ Tải Video MP4</a>
+              </div>
+            </div>
+
+            <div class="media-box" id="videoResultBox">
+              <div id="videoProgress" class="progress-overlay" style="display: none;">
+                <div class="progress-bar-wrap">
+                  <div id="videoProgressBar" class="progress-bar-fill" style="width: 15%;"></div>
+                </div>
+                <div id="videoProgressText" class="progress-text">Đang đưa tác vụ vào hàng đợi Muse… 15%</div>
+              </div>
+
+              <div id="videoPlaceholder" class="media-placeholder">
+                <svg fill="currentColor" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                <span>Chưa có video nào. Chọn ảnh và kịch bản cử động rồi bấm "Bắt Đầu Dựng Video".</span>
+              </div>
+
+              <video id="generatedVideo" controls playsinline style="display: none;"></video>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: PHÒNG THU & GHÉP VOICE ==================== -->
+    <section id="tab-voice" class="tab-content">
+      <div class="bento-grid">
+        <div class="col-6">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">🎙️ Phòng Thu Lồng Tiếng AI (Edge-TTS)</div>
+                <div class="card-sub">Tạo giọng đọc tự nhiên, diễn cảm tiếng Việt hoàn toàn miễn phí.</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Chọn Giọng Đọc Phù Hợp Nhân Vật:</label>
+              <select id="voiceSelect" class="select">
+                <!-- Rendered via JS -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Nội Dung Lời Thoại (Kịch bản cần bé KOL nói):</label>
+              <textarea id="voiceText" class="textarea" style="height: 120px;" placeholder="Chào cả nhà, hôm nay một ngày thật đẹp trời! Cùng Đan đi dạo phố cà phê nhé..."></textarea>
+            </div>
+
+            <div class="bento-grid" style="gap: 10px; margin-bottom: 14px;">
+              <div class="col-6">
+                <label class="form-label">Tốc độ nói:</label>
+                <select id="voiceRate" class="select">
+                  <option value="-10%">Chậm rãi (-10%)</option>
+                  <option value="+0%" selected>Tự nhiên (Mặc định)</option>
+                  <option value="+10%">Hơi nhanh (+10%)</option>
+                  <option value="+20%">Nhanh vui vẻ (+20%)</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Cao độ giọng:</label>
+                <select id="voicePitch" class="select">
+                  <option value="-2Hz">Trầm hơn chút</option>
+                  <option value="+0Hz" selected>Chuẩn tự nhiên</option>
+                  <option value="+2Hz">Trong trẻo / Cao hơn</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="btnGenVoice" class="btn btn-primary btn-block" onclick="generateVoice()">
+              🔊 Thu Âm Giọng Nói (Synthesize)
+            </button>
+
+            <div id="audioPlayerWrap" style="margin-top: 16px; display: none;">
+              <label class="form-label">File âm thanh đã xuất:</label>
+              <audio id="audioPlayer" controls style="width: 100%; margin-top: 4px;"></audio>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">✨ Ghép Đa Phương Tiện (FFmpeg Muxer)</div>
+                <div class="card-sub">Hợp nhất Video từ Muse và Giọng nói AI thành Clip hoàn chỉnh có tiếng.</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Đường dẫn Video nguồn (MP4):</label>
+              <input type="text" id="muxVideoUrl" class="input-text" placeholder="URL video từ tab Motion Lab" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Đường dẫn Giọng nói nguồn (MP3):</label>
+              <input type="text" id="muxAudioUrl" class="input-text" placeholder="URL audio từ phòng thu ở bên trái" />
+            </div>
+
+            <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px; font-size: 12px; color: #a1a1aa;">
+              💡 <b>FFmpeg thông minh:</b> Tự động khớp luồng âm thanh và hình ảnh, giữ nguyên chất lượng video 4K không giảm độ phân giải, xử lý chỉ trong 1-2 giây!
+            </div>
+
+            <button id="btnMuxMedia" class="btn btn-primary btn-block" onclick="muxMedia()">
+              🎬 1-Click Hợp Nhất Video & Âm Thanh (FFmpeg)
+            </button>
+
+            <div id="muxResultWrap" style="margin-top: 20px; display: none;">
+              <label class="form-label">Video Hoàn Chỉnh (Có Tiếng):</label>
+              <div class="media-box" style="height: 320px;">
+                <video id="muxedVideoPlayer" controls playsinline></video>
+              </div>
+              <div style="margin-top: 10px;">
+                <a id="btnDownloadMuxed" href="" download class="btn btn-secondary btn-block">⬇️ Tải Video Hoàn Chỉnh Về Máy</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 5: SOẠN THẢO CAPTION AI ==================== -->
+    <section id="tab-social" class="tab-content">
+      <div class="bento-grid">
+        <div class="col-5">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">✍️ Cấu Hình Soạn Thảo Caption</div>
+                <div class="card-sub">Dùng trí tuệ Muse Spark đóng vai chính bé KOL để viết status mạng xã hội.</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Phong Cách Bài Viết:</label>
+              <div id="captionStylesContainer" class="preset-chips">
+                <!-- Rendered via JS -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Bối cảnh bức ảnh hoặc chủ đề bài đăng:</label>
+              <input type="text" id="captionSceneName" class="input-text" placeholder="Ví dụ: Buổi sáng đi dạo phố Tràng Tiền ăn kem" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Chi tiết hoặc thông điệp muốn nhắc đến (Tùy chọn):</label>
+              <textarea id="captionTopic" class="textarea" placeholder="Ví dụ: Nhắc fan nhớ mặc ấm khi gió mùa về, hỏi fan cuối tuần đi đâu..."></textarea>
+            </div>
+
+            <button id="btnGenCaption" class="btn btn-primary btn-block" onclick="generateCaption()">
+              ⚡ Soạn Thảo Bài Viết Ngay (Muse Spark)
+            </button>
+          </div>
+        </div>
+
+        <div class="col-7">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">📱 Bài Đăng Hoàn Chỉnh Cho Mạng Xã Hội</div>
+                <div class="card-sub">Nội dung đã được căn chỉnh giọng văn, icon và hashtag đầy đủ.</div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" onclick="copyCaption()">📋 Sao Chép</button>
+                <button class="btn btn-primary btn-sm" onclick="sendCaptionToVoice()">🎙️ Đưa Lời Thoại Sang Thu Âm</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <textarea id="captionResultBox" class="textarea" style="height: 380px; font-size: 14px; line-height: 1.6; background: #000;" placeholder="Bài viết do AI tạo sẽ xuất hiện tại đây..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 6: KHO THÀNH PHẨM ==================== -->
+    <section id="tab-vault" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📂 Kho Thành Phẩm Của KOL Đang Chọn</div>
+            <div class="card-sub">Toàn bộ ảnh và video đã tạo được lưu trữ an toàn trong máy.</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadGallery()">🔄 Tải Lại</button>
+        </div>
+
+        <div id="galleryContainer" class="gallery-grid">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Tạo/Sửa KOL -->
+  <div id="kolModal" class="modal-overlay">
+    <div class="modal">
+      <div class="card-header">
+        <div class="card-title" id="modalTitle">🎭 Thêm Hồ Sơ KOL Ảo Mới</div>
+        <button class="btn btn-secondary btn-sm" onclick="closeKolModal()">✕</button>
+      </div>
+
+      <input type="hidden" id="editKolId" />
+
+      <div class="bento-grid" style="gap: 12px;">
+        <div class="col-6">
+          <div class="form-group">
+            <label class="form-label">Tên bé KOL (Ví dụ: Linh Đan):</label>
+            <input type="text" id="modalName" class="input-text" required />
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-group">
+            <label class="form-label">Tuổi (Ví dụ: 21):</label>
+            <input type="number" id="modalAge" class="input-text" value="21" />
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-group">
+            <label class="form-label">Hình mẫu / Phong cách:</label>
+            <input type="text" id="modalArchetype" class="input-text" placeholder="Nàng thơ, Fashionista..." />
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-group">
+            <label class="form-label">Quốc tịch:</label>
+            <input type="text" id="modalNationality" class="input-text" value="Việt Nam" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Câu Slogan / Tagline ngắn:</label>
+        <input type="text" id="modalTagline" class="input-text" placeholder="Nàng thơ Hà Nội dịu dàng & thanh khiết" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">DNA Prompt Nhận Dạng (Rất quan trọng - Mô tả chi tiết khuôn mặt, tóc, nốt ruồi...):</label>
+        <textarea id="modalDnaPrompt" class="textarea" style="height: 100px;" placeholder="A gorgeous 21-year-old Vietnamese girl, natural soft double eyelids, charming tiny mole below left eye, silky black wavy hair..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Tiểu sử & Phong cách sống:</label>
+        <textarea id="modalBio" class="textarea" placeholder="Sinh viên thiết kế, thích cafe, chụp ảnh film..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Giọng điệu khi trò chuyện:</label>
+        <input type="text" id="modalTone" class="input-text" placeholder="Dịu dàng, xưng em, thân thiện..." />
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+        <button class="btn btn-secondary" onclick="closeKolModal()">Hủy</button>
+        <button class="btn btn-primary" onclick="submitKolForm()">Lưu Hồ Sơ</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    /* ============================================================
+     * MuseKOL Studio — Frontend Core Logic
+     * ============================================================ */
+    let PRESETS = null;
+    let PROFILES = [];
+    let ACTIVE_KOL = null;
+
+    let selectedSceneId = null;
+    let selectedMotionId = null;
+    let selectedStyleId = null;
+
+    let currentGeneratedImageUrl = null;
+    let currentGeneratedVideoUrl = null;
+    let currentGeneratedAudioUrl = null;
+
+    // Toast notification
+    function toast(msg, type = 'info') {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'show ' + (type === 'ok' ? 'success' : type === 'err' ? 'error' : '');
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.className = '', 3500);
+    }
+
+    // Tab Switcher
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      const activeBtn = document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`);
+      if (activeBtn) activeBtn.classList.add('active');
+      const target = document.getElementById(tabId);
+      if (target) target.classList.add('active');
+    }
+
+    // Init App
+    async function initApp() {
+      try {
+        const [presetsRes, profilesRes] = await Promise.all([
+          fetch('/kol/api/presets').then(r => r.json()),
+          fetch('/kol/api/profiles').then(r => r.json())
+        ]);
+        PRESETS = presetsRes;
+        PROFILES = profilesRes;
+
+        renderPresets();
+        renderProfilesList();
+
+        if (PROFILES.length > 0) {
+          switchActiveKol(PROFILES[0].id);
+        }
+      } catch (err) {
+        console.error("Init failed:", err);
+        toast("Không thể tải dữ liệu KOL Studio. Vui lòng kiểm tra server.", "err");
+      }
+    }
+
+    // Render Presets
+    function renderPresets() {
+      if (!PRESETS) return;
+
+      // Scenes
+      const scWrap = document.getElementById('scenesContainer');
+      scWrap.innerHTML = '';
+      (PRESETS.lookbook_scenes || []).forEach((sc, i) => {
+        const d = document.createElement('div');
+        d.className = 'preset-chip' + (i === 0 ? ' active' : '');
+        d.innerHTML = `<span>${sc.icon || '📸'}</span> <span>${sc.name}</span>`;
+        d.onclick = () => {
+          document.querySelectorAll('#scenesContainer .preset-chip').forEach(c => c.classList.remove('active'));
+          d.classList.add('active');
+          selectedSceneId = sc.id;
+          if (sc.best_ratio) document.getElementById('lookbookRatio').value = sc.best_ratio;
+        };
+        scWrap.appendChild(d);
+        if (i === 0) selectedSceneId = sc.id;
+      });
+
+      // Motions
+      const motWrap = document.getElementById('motionPresetsContainer');
+      motWrap.innerHTML = '';
+      (PRESETS.motion_presets || []).forEach((m, i) => {
+        const d = document.createElement('div');
+        d.className = 'preset-chip' + (i === 0 ? ' active' : '');
+        d.innerHTML = `<span>${m.name}</span>`;
+        d.onclick = () => {
+          document.querySelectorAll('#motionPresetsContainer .preset-chip').forEach(c => c.classList.remove('active'));
+          d.classList.add('active');
+          selectedMotionId = m.id;
+        };
+        motWrap.appendChild(d);
+        if (i === 0) selectedMotionId = m.id;
+      });
+
+      // Voices
+      const vSelect = document.getElementById('voiceSelect');
+      vSelect.innerHTML = '';
+      (PRESETS.voices || []).forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.id;
+        opt.textContent = `${v.name}`;
+        vSelect.appendChild(opt);
+      });
+
+      // Caption styles
+      const capWrap = document.getElementById('captionStylesContainer');
+      capWrap.innerHTML = '';
+      (PRESETS.caption_styles || []).forEach((s, i) => {
+        const d = document.createElement('div');
+        d.className = 'preset-chip' + (i === 0 ? ' active' : '');
+        d.innerHTML = `<span>${s.name}</span>`;
+        d.onclick = () => {
+          document.querySelectorAll('#captionStylesContainer .preset-chip').forEach(c => c.classList.remove('active'));
+          d.classList.add('active');
+          selectedStyleId = s.id;
+        };
+        capWrap.appendChild(d);
+        if (i === 0) selectedStyleId = s.id;
+      });
+    }
+
+    // Render Profiles in Selector & Cards
+    function renderProfilesList() {
+      const select = document.getElementById('activeKolSelect');
+      select.innerHTML = '';
+      const cardsWrap = document.getElementById('kolCardsContainer');
+      cardsWrap.innerHTML = '';
+
+      PROFILES.forEach(p => {
+        // Option
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `${p.name} (${p.archetype || 'KOL'})`;
+        select.appendChild(opt);
+
+        // Card
+        const card = document.createElement('div');
+        card.className = 'kol-card' + (ACTIVE_KOL && ACTIVE_KOL.id === p.id ? ' selected' : '');
+        card.onclick = () => switchActiveKol(p.id);
+
+        const avatarHtml = p.face_anchor_url 
+          ? `<img src="${p.face_anchor_url}" class="kol-avatar" />`
+          : `<div class="kol-avatar-ph">🌸</div>`;
+
+        card.innerHTML = `
+          <div class="kol-card-top">
+            ${avatarHtml}
+            <div class="kol-meta">
+              <div class="kol-name">${p.name} <span style="font-size:12px; font-weight:normal; color:var(--primary);">${p.age || 21} tuổi</span></div>
+              <div class="kol-tagline">${p.tagline || p.archetype}</div>
+            </div>
+          </div>
+          <div class="kol-dna-snippet">${p.dna_prompt || 'Chưa thiết lập DNA'}</div>
+          <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; font-size:11px; color:var(--text-muted);">
+            <span>📸 ${p.gallery_count || 0} ảnh/video</span>
+            <span style="color:var(--accent-emerald);">● ${p.face_anchor_url ? 'Đã khóa Anchor' : 'Chưa có Anchor'}</span>
+          </div>
+        `;
+        cardsWrap.appendChild(card);
+      });
+
+      if (ACTIVE_KOL) select.value = ACTIVE_KOL.id;
+    }
+
+    // Switch Active KOL
+    function switchActiveKol(kolId) {
+      ACTIVE_KOL = PROFILES.find(p => p.id === kolId) || PROFILES[0] || null;
+      if (!ACTIVE_KOL) return;
+
+      document.getElementById('activeKolSelect').value = ACTIVE_KOL.id;
+
+      // Update Card selections
+      document.querySelectorAll('.kol-card').forEach((c, idx) => {
+        if (PROFILES[idx] && PROFILES[idx].id === ACTIVE_KOL.id) {
+          c.classList.add('selected');
+        } else {
+          c.classList.remove('selected');
+        }
+      });
+
+      // Update Detail view
+      document.getElementById('viewDnaPrompt').value = ACTIVE_KOL.dna_prompt || '';
+      document.getElementById('viewArchetype').textContent = `${ACTIVE_KOL.archetype || 'Nàng thơ'} (${ACTIVE_KOL.nationality || 'Việt Nam'})`;
+      document.getElementById('viewVoice').textContent = ACTIVE_KOL.voice || 'vi-VN-HoaiMyNeural';
+      document.getElementById('viewBio').textContent = ACTIVE_KOL.bio || 'Chưa có tiểu sử';
+
+      // Update Anchor view
+      const ancImg = document.getElementById('anchorPreviewImg');
+      const ancPh = document.getElementById('anchorPlaceholderText');
+      if (ACTIVE_KOL.face_anchor_url) {
+        ancImg.src = ACTIVE_KOL.face_anchor_url;
+        ancImg.style.display = 'block';
+        ancPh.style.display = 'none';
+      } else {
+        ancImg.style.display = 'none';
+        ancPh.style.display = 'block';
+      }
+
+      // Voice select default
+      if (ACTIVE_KOL.voice) {
+        document.getElementById('voiceSelect').value = ACTIVE_KOL.voice;
+      }
+
+      loadGallery();
+    }
+
+    // Upload Face Anchor
+    async function uploadFaceAnchor(file) {
+      if (!file || !ACTIVE_KOL) return;
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        toast('Đang tải Face Anchor lên...', 'info');
+        const res = await fetch(`/kol/api/profiles/${ACTIVE_KOL.id}/anchor`, {
+          method: 'POST',
+          body: formData
+        }).then(r => r.json());
+        if (res.status === 'ok') {
+          ACTIVE_KOL.face_anchor_url = res.anchor_url;
+          switchActiveKol(ACTIVE_KOL.id);
+          renderProfilesList();
+          toast('Đã cập nhật Face Anchor thành công!', 'ok');
+        }
+      } catch (e) {
+        toast('Lỗi tải Face Anchor: ' + e, 'err');
+      }
+    }
+
+    // Modal Create/Edit KOL
+    function openNewKolModal() {
+      document.getElementById('modalTitle').textContent = '🎭 Thêm Hồ Sơ KOL Ảo Mới';
+      document.getElementById('editKolId').value = '';
+      document.getElementById('modalName').value = '';
+      document.getElementById('modalAge').value = 21;
+      document.getElementById('modalArchetype').value = '';
+      document.getElementById('modalNationality').value = 'Việt Nam';
+      document.getElementById('modalTagline').value = '';
+      document.getElementById('modalDnaPrompt').value = '';
+      document.getElementById('modalBio').value = '';
+      document.getElementById('modalTone').value = '';
+      document.getElementById('kolModal').classList.add('active');
+    }
+
+    function editCurrentKol() {
+      if (!ACTIVE_KOL) return;
+      document.getElementById('modalTitle').textContent = '✏️ Chỉnh Sửa Hồ Sơ ' + ACTIVE_KOL.name;
+      document.getElementById('editKolId').value = ACTIVE_KOL.id;
+      document.getElementById('modalName').value = ACTIVE_KOL.name || '';
+      document.getElementById('modalAge').value = ACTIVE_KOL.age || 21;
+      document.getElementById('modalArchetype').value = ACTIVE_KOL.archetype || '';
+      document.getElementById('modalNationality').value = ACTIVE_KOL.nationality || 'Việt Nam';
+      document.getElementById('modalTagline').value = ACTIVE_KOL.tagline || '';
+      document.getElementById('modalDnaPrompt').value = ACTIVE_KOL.dna_prompt || '';
+      document.getElementById('modalBio').value = ACTIVE_KOL.bio || '';
+      document.getElementById('modalTone').value = ACTIVE_KOL.personality_tone || '';
+      document.getElementById('kolModal').classList.add('active');
+    }
+
+    function closeKolModal() {
+      document.getElementById('kolModal').classList.remove('active');
+    }
+
+    async function submitKolForm() {
+      const name = document.getElementById('modalName').value.trim();
+      const dna = document.getElementById('modalDnaPrompt').value.trim();
+      if (!name || !dna) {
+        toast('Vui lòng nhập tên và DNA Prompt nhận diện', 'err');
+        return;
+      }
+      const payload = {
+        id: document.getElementById('editKolId').value || undefined,
+        name: name,
+        age: parseInt(document.getElementById('modalAge').value) || 21,
+        archetype: document.getElementById('modalArchetype').value,
+        nationality: document.getElementById('modalNationality').value,
+        tagline: document.getElementById('modalTagline').value,
+        dna_prompt: dna,
+        bio: document.getElementById('modalBio').value,
+        personality_tone: document.getElementById('modalTone').value
+      };
+
+      try {
+        const res = await fetch('/kol/api/profiles', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        }).then(r => r.json());
+
+        const idx = PROFILES.findIndex(p => p.id === res.id);
+        if (idx >= 0) PROFILES[idx] = res;
+        else PROFILES.push(res);
+
+        closeKolModal();
+        renderProfilesList();
+        switchActiveKol(res.id);
+        toast('Đã lưu hồ sơ KOL ' + res.name + ' thành công!', 'ok');
+      } catch (e) {
+        toast('Lỗi lưu hồ sơ: ' + e, 'err');
+      }
+    }
+
+    // ================= Lookbook Generation =================
+    async function generateLookbookImage() {
+      if (!ACTIVE_KOL) return toast('Vui lòng chọn hoặc tạo một bé KOL trước', 'err');
+      const btn = document.getElementById('btnGenImage');
+      const prog = document.getElementById('imgProgress');
+      const ph = document.getElementById('imagePlaceholder');
+      const img = document.getElementById('generatedImage');
+      const actBtns = document.getElementById('imageActionBtns');
+
+      btn.disabled = true;
+      prog.style.display = 'flex';
+      ph.style.display = 'none';
+      img.style.display = 'none';
+      actBtns.style.display = 'none';
+
+      const payload = {
+        profile_id: ACTIVE_KOL.id,
+        scene_id: selectedSceneId,
+        custom_prompt: document.getElementById('customLookbookPrompt').value.trim(),
+        aspect_ratio: document.getElementById('lookbookRatio').value,
+        use_face_anchor: document.getElementById('chkUseAnchor').checked
+      };
+
+      try {
+        const res = await fetch('/kol/api/generate-image', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        }).then(r => r.json());
+
+        if (res.status === 'success' && res.url) {
+          currentGeneratedImageUrl = res.url;
+          img.src = res.url;
+          img.style.display = 'block';
+          actBtns.style.display = 'flex';
+          document.getElementById('btnDownloadImg').href = res.url;
+          document.getElementById('imagePromptUsedBox').style.display = 'block';
+          document.getElementById('imagePromptUsedText').textContent = res.prompt;
+          toast('Đã bấm máy xong bức ảnh mới!', 'ok');
+          loadGallery();
+        } else {
+          throw new Error(res.detail || 'Không nhận được ảnh');
+        }
+      } catch (e) {
+        toast('Lỗi sinh ảnh: ' + e.message, 'err');
+        ph.style.display = 'flex';
+      } finally {
+        prog.style.display = 'none';
+        btn.disabled = false;
+      }
+    }
+
+    async function setAsAnchorFromGen() {
+      if (!currentGeneratedImageUrl || !ACTIVE_KOL) return;
+      try {
+        const blob = await fetch(currentGeneratedImageUrl).then(r => r.blob());
+        const file = new File([blob], 'anchor.png', {type: blob.type});
+        await uploadFaceAnchor(file);
+      } catch (e) {
+        toast('Lỗi đặt Anchor: ' + e, 'err');
+      }
+    }
+
+    function sendToMotionLab() {
+      if (!currentGeneratedImageUrl) return;
+      document.getElementById('motionSourceImgUrl').value = currentGeneratedImageUrl;
+      const th = document.getElementById('motionSourceImgThumb');
+      th.src = currentGeneratedImageUrl;
+      th.style.display = 'block';
+      document.getElementById('motionNoImgHint').style.display = 'none';
+      showTab('tab-motion');
+      toast('Đã nạp ảnh vào Motion Lab!', 'ok');
+    }
+
+    // ================= Motion & Video Generation =================
+    let videoPollInterval = null;
+
+    async function generateMotionVideo() {
+      if (!ACTIVE_KOL) return toast('Vui lòng chọn bé KOL', 'err');
+      const imgUrl = document.getElementById('motionSourceImgUrl').value.trim();
+      if (!imgUrl) return toast('Vui lòng cung cấp ảnh nguồn làm First Frame', 'err');
+
+      const btn = document.getElementById('btnGenVideo');
+      const prog = document.getElementById('videoProgress');
+      const progBar = document.getElementById('videoProgressBar');
+      const progTxt = document.getElementById('videoProgressText');
+      const ph = document.getElementById('videoPlaceholder');
+      const vid = document.getElementById('generatedVideo');
+      const actBtns = document.getElementById('videoActionBtns');
+
+      btn.disabled = true;
+      prog.style.display = 'flex';
+      ph.style.display = 'none';
+      vid.style.display = 'none';
+      actBtns.style.display = 'none';
+      progBar.style.width = '15%';
+      progTxt.textContent = 'Đang đưa tác vụ vào hàng đợi Muse… (15%)';
+
+      const payload = {
+        profile_id: ACTIVE_KOL.id,
+        image_url: imgUrl,
+        motion_id: selectedMotionId,
+        custom_motion: document.getElementById('customMotionPrompt').value.trim(),
+        duration: parseInt(document.getElementById('videoDuration').value) || 5,
+        aspect_ratio: document.getElementById('videoAspect').value
+      };
+
+      try {
+        const res = await fetch('/kol/api/generate-video', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        }).then(r => r.json());
+
+        if (res.task_id) {
+          pollVideoTask(res.task_id);
+        } else {
+          throw new Error(res.detail || 'Không tạo được tác vụ video');
+        }
+      } catch (e) {
+        toast('Lỗi tạo video: ' + e.message, 'err');
+        prog.style.display = 'none';
+        btn.disabled = false;
+        ph.style.display = 'flex';
+      }
+    }
+
+    function pollVideoTask(taskId) {
+      clearInterval(videoPollInterval);
+      const progBar = document.getElementById('videoProgressBar');
+      const progTxt = document.getElementById('videoProgressText');
+      const vid = document.getElementById('generatedVideo');
+      const prog = document.getElementById('videoProgress');
+      const btn = document.getElementById('btnGenVideo');
+      const actBtns = document.getElementById('videoActionBtns');
+
+      videoPollInterval = setInterval(async () => {
+        try {
+          const res = await fetch('/kol/api/tasks/' + taskId).then(r => r.json());
+          const p = res.progress || 20;
+          progBar.style.width = p + '%';
+          progTxt.textContent = `Đang render video chuyển động… ${p}%`;
+
+          if (res.status === 'completed' && res.result && res.result.url) {
+            clearInterval(videoPollInterval);
+            currentGeneratedVideoUrl = res.result.url;
+            vid.src = res.result.url;
+            vid.style.display = 'block';
+            prog.style.display = 'none';
+            btn.disabled = false;
+            actBtns.style.display = 'flex';
+            document.getElementById('btnDownloadVid').href = res.result.url;
+            document.getElementById('muxVideoUrl').value = res.result.url;
+            toast('Dựng video chuyển động thành công!', 'ok');
+            loadGallery();
+          } else if (res.status === 'failed') {
+            clearInterval(videoPollInterval);
+            prog.style.display = 'none';
+            btn.disabled = false;
+            toast('Dựng video thất bại: ' + (res.error || 'Timeout'), 'err');
+          }
+        } catch (err) {
+          console.error('Poll error:', err);
+        }
+      }, 3000);
+    }
+
+    function sendToVoiceLab() {
+      if (currentGeneratedVideoUrl) {
+        document.getElementById('muxVideoUrl').value = currentGeneratedVideoUrl;
+      }
+      showTab('tab-voice');
+      toast('Đã chuyển video sang Phòng Thu!', 'ok');
+    }
+
+    // ================= Voice Synthesis & Media Muxing =================
+    async function generateVoice() {
+      const text = document.getElementById('voiceText').value.trim();
+      if (!text) return toast('Vui lòng nhập lời thoại cần đọc', 'err');
+
+      const btn = document.getElementById('btnGenVoice');
+      btn.disabled = true;
+      btn.textContent = 'Đang thu âm...';
+
+      const payload = {
+        text: text,
+        voice_id: document.getElementById('voiceSelect').value,
+        rate: document.getElementById('voiceRate').value,
+        pitch: document.getElementById('voicePitch').value
+      };
+
+      try {
+        const res = await fetch('/kol/api/generate-voice', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        }).then(r => r.json());
+
+        if (res.audio_url) {
+          currentGeneratedAudioUrl = res.audio_url;
+          const player = document.getElementById('audioPlayer');
+          player.src = res.audio_url;
+          document.getElementById('audioPlayerWrap').style.display = 'block';
+          document.getElementById('muxAudioUrl').value = res.audio_url;
+          player.play();
+          toast('Thu âm lời thoại thành công!', 'ok');
+        }
+      } catch (e) {
+        toast('Lỗi tạo giọng nói: ' + e, 'err');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🔊 Thu Âm Giọng Nói (Synthesize)';
+      }
+    }
+
+    async function muxMedia() {
+      const vUrl = document.getElementById('muxVideoUrl').value.trim();
+      const aUrl = document.getElementById('muxAudioUrl').value.trim();
+      if (!vUrl || !aUrl) return toast('Vui lòng cung cấp cả Video và Audio URL', 'err');
+
+      const btn = document.getElementById('btnMuxMedia');
+      btn.disabled = true;
+      btn.textContent = 'Đang ghép FFmpeg...';
+
+      try {
+        const res = await fetch('/kol/api/mux-media', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({video_url: vUrl, audio_url: aUrl})
+        }).then(r => r.json());
+
+        if (res.muxed_url) {
+          const player = document.getElementById('muxedVideoPlayer');
+          player.src = res.muxed_url;
+          document.getElementById('muxResultWrap').style.display = 'block';
+          document.getElementById('btnDownloadMuxed').href = res.muxed_url;
+          player.play();
+          toast('Ghép video và âm thanh thành công 100%!', 'ok');
+        }
+      } catch (e) {
+        toast('Lỗi ghép media: ' + e, 'err');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🎬 1-Click Hợp Nhất Video & Âm Thanh (FFmpeg)';
+      }
+    }
+
+    // ================= Caption Generation =================
+    async function generateCaption() {
+      if (!ACTIVE_KOL) return toast('Vui lòng chọn bé KOL', 'err');
+      const btn = document.getElementById('btnGenCaption');
+      btn.disabled = true;
+      btn.textContent = 'Muse Spark đang viết...';
+
+      const payload = {
+        profile_id: ACTIVE_KOL.id,
+        style_id: selectedStyleId || 'flirty',
+        scene_name: document.getElementById('captionSceneName').value.trim(),
+        topic: document.getElementById('captionTopic').value.trim()
+      };
+
+      try {
+        const res = await fetch('/kol/api/generate-caption', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        }).then(r => r.json());
+
+        if (res.caption) {
+          document.getElementById('captionResultBox').value = res.caption;
+          toast('Đã soạn xong bài viết mạng xã hội!', 'ok');
+        }
+      } catch (e) {
+        toast('Lỗi soạn bài: ' + e, 'err');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '⚡ Soạn Thảo Bài Viết Ngay (Muse Spark)';
+      }
+    }
+
+    function copyCaption() {
+      const text = document.getElementById('captionResultBox').value;
+      if (!text) return;
+      navigator.clipboard.writeText(text);
+      toast('Đã sao chép caption vào clipboard!', 'ok');
+    }
+
+    function sendCaptionToVoice() {
+      const text = document.getElementById('captionResultBox').value;
+      if (!text) return;
+      // Strip hashtags for voiceover
+      const clean = text.replace(/#\w+/g, '').replace(/[🌸✨💖☕🏖️💃🎬]/g, '').trim();
+      document.getElementById('voiceText').value = clean;
+      showTab('tab-voice');
+      toast('Đã chuyển lời thoại sang Phòng Thu!', 'ok');
+    }
+
+    // ================= Gallery Vault =================
+    async function loadGallery() {
+      if (!ACTIVE_KOL) return;
+      const wrap = document.getElementById('galleryContainer');
+      wrap.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">Đang tải kho ảnh...</div>';
+
+      try {
+        const items = await fetch('/kol/api/gallery/' + ACTIVE_KOL.id).then(r => r.json());
+        if (!items || items.length === 0) {
+          wrap.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">Chưa có ảnh/video nào trong kho.</div>';
+          return;
+        }
+        wrap.innerHTML = '';
+        items.forEach(it => {
+          const d = document.createElement('div');
+          d.className = 'gallery-item';
+          if (it.kind === 'video') {
+            d.innerHTML = `
+              <video src="${it.url}" muted></video>
+              <div class="gallery-tag">VIDEO</div>
+            `;
+            d.onclick = () => {
+              window.open(it.url, '_blank');
+            };
+          } else {
+            d.innerHTML = `
+              <img src="${it.url}" />
+              <div class="gallery-tag">ẢNH</div>
+            `;
+            d.onclick = () => {
+              document.getElementById('motionSourceImgUrl').value = it.url;
+              const th = document.getElementById('motionSourceImgThumb');
+              th.src = it.url;
+              th.style.display = 'block';
+              document.getElementById('motionNoImgHint').style.display = 'none';
+              showTab('tab-motion');
+              toast('Đã chọn ảnh này làm First Frame cho video!', 'ok');
+            };
+          }
+          wrap.appendChild(d);
+        });
+      } catch (err) {
+        wrap.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">Không thể tải thư viện.</div>';
+      }
+    }
+
+    // Start
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>

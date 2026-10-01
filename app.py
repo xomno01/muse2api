@@ -59,6 +59,9 @@ if not log.handlers:
 CFG.ensure_dirs()
 app = FastAPI(title="muse2api", version="1.5.3")
 
+from kol_studio import router as kol_router
+app.include_router(kol_router)
+
 # Cookie 助手脚本从 muse.ai 页面发起导入请求，需要放行该来源；
 # 浏览器扩展从 chrome-extension:// 发起，也一并放行。
 #
@@ -1737,6 +1740,32 @@ def index():
 @app.get("/admin", response_class=HTMLResponse)
 def admin_page():
     return _admin_html()
+
+
+def _kol_html() -> str:
+    p = os.path.join(BASE_DIR, "kol.html")
+    try:
+        with open(p, encoding="utf-8") as f:
+            return f.read()
+    except OSError:
+        return ("<!doctype html><meta charset=utf-8><body style='background:#09090b;"
+                "color:#f4f4f5;font-family:system-ui;padding:40px'>"
+                "<h2>MuseKOL Studio</h2><p>Giao diện kol.html đang được tải hoặc chưa tạo.</p></body>")
+
+
+@app.get("/kol", response_class=HTMLResponse)
+def kol_page():
+    return _kol_html()
+
+
+@app.get("/kol/media/{folder}/{name}")
+def get_kol_media(folder: str, name: str):
+    if "/" in name or "\\" in name or ".." in name or folder not in ("anchors", "audio", "videos", "gallery"):
+        raise HTTPException(400, "Tên file không hợp lệ")
+    p = os.path.join(BASE_DIR, "data", "kol", folder, name)
+    if not os.path.isfile(p):
+        raise HTTPException(404, "File không tồn tại")
+    return FileResponse(p)
 
 
 

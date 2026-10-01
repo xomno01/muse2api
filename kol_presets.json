@@ -1,0 +1,243 @@
+{
+  "characters": [
+    {
+      "id": "char_linh_dan",
+      "name": "Linh Đan",
+      "tagline": "Nàng thơ Hà Nội dịu dàng & thanh khiết",
+      "age": 21,
+      "archetype": "Nàng thơ / Nữ sinh thanh lịch",
+      "nationality": "Việt Nam",
+      "voice": "vi-VN-HoaiMyNeural",
+      "dna_prompt": "A gorgeous 21-year-old Vietnamese girl named Linh Dan, gentle oval face, naturally soft double eyelids, charming tiny mole below her left eye, long silky black wavy hair flowing naturally, delicate and soft facial features, radiant porcelain skin, warm and sweet smile, elegant Vietnamese aesthetic, ultra-realistic portrait, 8k resolution, raw photo quality",
+      "negative_prompt": "ugly, deformed, disfigured, extra limbs, blur, bad anatomy, text, watermark, signature, logo, plastic skin, oversaturated",
+      "bio": "Sinh viên ngành thiết kế tại Hà Nội, mê cà phê phố cổ, thích đọc sách, chụp ảnh film và diện váy hoa vintage.",
+      "personality_tone": "Dịu dàng, tinh tế, thích dùng từ ngữ nhẹ nhàng, xưng hô 'em' và gọi người theo dõi là 'cả nhà' hoặc 'anh/chị'."
+    },
+    {
+      "id": "char_bao_sam",
+      "name": "Bảo Sam",
+      "tagline": "Tiểu thư Sài Gòn sang chảnh & sành điệu",
+      "age": 23,
+      "archetype": "Fashionista / Sang chảnh",
+      "nationality": "Việt Nam",
+      "voice": "vi-VN-HoaiMyNeural",
+      "dna_prompt": "A stunning 23-year-old modern Vietnamese fashion model named Bao Sam, sharp elegant V-line jaw, alluring cat eyes, full plump lips, stylish shoulder-length layered ash-brown hair, confident charismatic expression, flawless glowing glass skin, high-end luxury fashion vibe, studio portrait, 8k, photorealistic",
+      "negative_prompt": "ugly, deformed, disfigured, extra limbs, blur, bad anatomy, text, watermark, signature, logo, plastic skin",
+      "bio": "KOL thời trang và phong cách sống cao cấp tại TP.HCM, chuyên review đồ hiệu, nghỉ dưỡng resort 5 sao và dự tiệc tối.",
+      "personality_tone": "Tự tin, sang xịn mịn, tràn đầy năng lượng, phong cách nói chuyện cuốn hút và sành điệu."
+    },
+    {
+      "id": "char_mia_cyber",
+      "name": "Mia",
+      "tagline": "Cá tính đường phố & Nữ DJ tương lai",
+      "age": 22,
+      "archetype": "Cyberpunk / Streetwear Rebel",
+      "nationality": "Việt Nam",
+      "voice": "vi-VN-HoaiMyNeural",
+      "dna_prompt": "A trendy 22-year-old rebellious Vietnamese girl named Mia, cool edgy facial expression, sharp piercing gaze, short platinum bob haircut with subtle purple highlights, slight smirk, modern techwear aesthetic, neon city ambiance, ultra-detailed 8k, cinematic photo",
+      "negative_prompt": "ugly, deformed, disfigured, extra limbs, blur, bad anatomy, text, watermark, signature, logo",
+      "bio": "DJ kiêm nhà sản xuất âm nhạc điện tử, mê văn hóa Y2K, trang phục techwear và những con phố ngập tràn ánh đèn neon.",
+      "personality_tone": "Ngầu, thẳng thắn, hài hước kiểu gen Z, hay dùng từ lóng và icon năng động."
+    },
+    {
+      "id": "char_mai_anh",
+      "name": "Mai Anh",
+      "tagline": "Nữ thần phòng Gym & Thể thao năng động",
+      "age": 24,
+      "archetype": "Sporty / Fitness Model",
+      "nationality": "Việt Nam",
+      "voice": "vi-VN-HoaiMyNeural",
+      "dna_prompt": "An athletic attractive 24-year-old Vietnamese fitness influencer named Mai Anh, healthy sun-kissed skin tone, bright cheerful radiant smile, defined toned jawline, high sleek ponytail, sparkling expressive eyes, sporty aesthetic, natural gym lighting, 8k resolution, crisp detail",
+      "negative_prompt": "ugly, deformed, disfigured, extra limbs, blur, bad anatomy, text, watermark, signature, logo",
+      "bio": "Huấn luyện viên Pilates & Gym, truyền cảm hứng sống khỏe, ăn sạch (eat clean) và thói quen tích cực mỗi ngày.",
+      "personality_tone": "Tràn đầy nhiệt huyết, tích cực, truyền động lực, giọng văn thân thiện như cô bạn thân."
+    }
+  ],
+  "lookbook_scenes": [
+    {
+      "id": "scene_cafe_vintage",
+      "category": "Đời thường (Lifestyle)",
+      "name": "Quán Cà Phê Mùa Thu Cổ Kính",
+      "icon": "☕",
+      "prompt_addon": "sitting cozily by a rustic wooden window at an aesthetic vintage Hanoi coffee shop, holding a warm ceramic cappuccino cup with delicate latte art, gentle morning sunlight streaming through green tree leaves casting soft shadows, wearing an oversized knit beige cardigan over a simple silk camisole, warm cinematic color grading, 50mm f/1.4 lens bokeh background",
+      "best_ratio": "1:1"
+    },
+    {
+      "id": "scene_balcony_sunset",
+      "category": "Đời thường (Lifestyle)",
+      "name": "Ban Công Chung Cư Hoàng Hôn Rực Rỡ",
+      "icon": "🌇",
+      "prompt_addon": "leaning gracefully against the metal railing of a modern high-rise luxury apartment balcony, looking out over the sparkling city skyline during golden hour sunset, soft wind gently blowing hair and floral dress hem, golden hour glow illuminating face and skin, warm amber and violet twilight sky, cinematic depth of field",
+      "best_ratio": "9:16"
+    },
+    {
+      "id": "scene_street_walk",
+      "category": "Đời thường (Lifestyle)",
+      "name": "Tản Bộ Phố Đi Bộ Yên Bình",
+      "icon": "🚶‍♀️",
+      "prompt_addon": "strolling casually along a charming cobblestone tree-lined pedestrian avenue, carrying a cute minimalist canvas tote bag, looking over shoulder with a relaxed gentle smile, full-body shot, dressed in stylish casual high-waisted linen trousers and a pastel knit top, crisp natural daylight, vibrant street life blurred in background",
+      "best_ratio": "3:4"
+    },
+    {
+      "id": "scene_bedroom_morning",
+      "category": "Đời thường (Lifestyle)",
+      "name": "Phòng Ngủ Ban Mai Ấm Cúng",
+      "icon": "🛏️",
+      "prompt_addon": "sitting on a soft white linen bed surrounded by fluffy pillows, soft early morning sunlight bathing the minimalist airy bedroom, holding a book, cozy off-shoulder cream sweater, relaxed messy chic hair, peaceful intimate natural lifestyle photo",
+      "best_ratio": "1:1"
+    },
+    {
+      "id": "scene_streetwear_y2k",
+      "category": "Thời trang (Fashion)",
+      "name": "Streetwear Gen Z Năng Động",
+      "icon": "👟",
+      "prompt_addon": "standing on a modern concrete bridge overpass, fashionable streetwear outfit with cropped utility vest, baggy cargo pants, chunky sneakers, cool urban pose, dramatic low-angle shot, overcast moody sky, high fashion magazine street snap",
+      "best_ratio": "9:16"
+    },
+    {
+      "id": "scene_luxury_gala",
+      "category": "Thời trang (Fashion)",
+      "name": "Dạ Hội Thảm Đỏ Sang Trọng",
+      "icon": "👗",
+      "prompt_addon": "attending a prestigious evening luxury gala event, wearing a breathtaking floor-length emerald green silk gown with a daring leg slit, exquisite diamond necklace and earrings, elegant evening updo hairstyle, grand ballroom with crystal chandeliers softly glowing in background, red carpet ambiance",
+      "best_ratio": "9:16"
+    },
+    {
+      "id": "scene_beach_summer",
+      "category": "Thời trang (Fashion)",
+      "name": "Kỳ Nghỉ Bãi Biển Nhiệt Đới",
+      "icon": "🏖️",
+      "prompt_addon": "walking along pristine white sand beach shore, crystal-clear turquoise ocean waves gently lapping at feet, wearing a flowing sheer white beach coverup over a chic swimwear, tropical palm trees swaying in breeze, bright sunny sky, golden tan skin shimmer, vacation postcard aesthetics",
+      "best_ratio": "9:16"
+    },
+    {
+      "id": "scene_office_boss",
+      "category": "Thời trang (Fashion)",
+      "name": "Nữ Doanh Nhân Trẻ Hiện Đại",
+      "icon": "💼",
+      "prompt_addon": "walking through the modern glass atrium lobby of a premier corporate financial center, dressed in a sharp tailored oversized beige blazer suit, sleek leather tote bag, confident professional gait, sharp focus, clean architectural lines in background",
+      "best_ratio": "3:4"
+    },
+    {
+      "id": "scene_vogue_studio",
+      "category": "Nghệ thuật & Tạp chí (Editorial)",
+      "name": "Bìa Tạp Chí Thời Trang Studio",
+      "icon": "📸",
+      "prompt_addon": "extreme close-up high-fashion beauty portrait for Vogue cover, editorial Rembrandt lighting, pristine matte makeup with glossy lips, mesmerizing eye contact, minimal studio gray backdrop, 85mm portrait master lens, ultra-sharp skin texture and eyelashes",
+      "best_ratio": "1:1"
+    },
+    {
+      "id": "scene_cyberpunk_neon",
+      "category": "Nghệ thuật & Tạp chí (Editorial)",
+      "name": "Cyberpunk Neon Đêm Mưa",
+      "icon": "🌃",
+      "prompt_addon": "standing in a rain-slicked futuristic narrow alleyway illuminated by vibrant cyan and magenta neon signage, raindrops glistening on transparent raincoat, glowing reflections on wet asphalt, cyberpunk blade runner aesthetic, cinematic atmospheric lighting",
+      "best_ratio": "9:16"
+    },
+    {
+      "id": "scene_traditional_aodai",
+      "category": "Nghệ thuật & Tạp chí (Editorial)",
+      "name": "Nàng Thơ Áo Dài Sen Truyền Thống",
+      "icon": "🪷",
+      "prompt_addon": "wearing an exquisite pure white silk traditional Vietnamese Ao Dai, standing gently beside a blooming pink lotus pond, holding a conical hat (non la), graceful demure pose, misty morning lotus leaves and flowers, soft ethereal natural lighting, timeless cultural beauty",
+      "best_ratio": "9:16"
+    }
+  ],
+  "motion_presets": [
+    {
+      "id": "motion_smile_blink",
+      "name": "Mỉm Cười Duyên & Làn Tóc Bay",
+      "description": "Nhìn vào camera, ánh mắt long lanh chớp nhẹ, từ từ mỉm cười dịu dàng, làn gió thổi nhẹ vài lọn tóc bay.",
+      "prompt_text": "The girl looks directly into the camera with sparkling eyes, blinking gently, a warm charming smile naturally forms on her lips, soft breeze blowing her hair strands gracefully, subtle micro-expressions, 4k ultra-smooth motion"
+    },
+    {
+      "id": "motion_wave_greet",
+      "name": "Vẫy Tay Chào Năng Lượng (Say Hi)",
+      "description": "Giơ bàn tay lên khẽ vẫy chào người xem, nghiêng đầu mỉm cười thân thiện rạng rỡ.",
+      "prompt_text": "The girl gently raises her hand to wave hello to the viewer, tilting her head slightly with a bright joyful smile, welcoming and cheerful body language, lifelike movement"
+    },
+    {
+      "id": "motion_hair_tuck",
+      "name": "Vén Tóc Sau Tai & E Thẹn",
+      "description": "Bàn tay nhẹ nhàng đưa lên vén lọn tóc qua vành tai, khẽ cười e thẹn rồi ngước mắt nhìn camera.",
+      "prompt_text": "The girl delicately raises her hand to tuck a strand of hair behind her ear, showing a demure shy smile, looking up into the camera with tender affection, natural fluid motion"
+    },
+    {
+      "id": "motion_sip_coffee",
+      "name": "Nhấp Ly Cà Phê & Thư Thái",
+      "description": "Đưa tách cà phê lên nhấp một ngụm nhỏ, sau đó hạ tách xuống và mỉm cười thư thái với ống kính.",
+      "prompt_text": "The girl gracefully raises the coffee cup to take a small sip, then lowers the cup, sighing with content and smiling peacefully at the viewer, natural café moment"
+    },
+    {
+      "id": "motion_walk_turn",
+      "name": "Bước Đi & Ngoái Đầu (Slow-Motion)",
+      "description": "Chuyển động bước đi rồi ngoái đầu nhìn lại nở nụ cười toả nắng, váy áo bay bổng như phim điện ảnh.",
+      "prompt_text": "The girl walks forward then slowly turns her head back to look at the camera with an enchanting beaming smile, dress fluttering softly in cinematic slow motion"
+    },
+    {
+      "id": "motion_cute_peace",
+      "name": "Tạo Dáng Chữ V Đáng Yêu",
+      "description": "Nghiêng đầu tinh nghịch, giơ 2 ngón tay tạo dáng chữ V áp vào má, nháy mắt đáng yêu.",
+      "prompt_text": "The girl cheerfully tilts her head, raising two fingers in a cute peace sign beside her cheek, giving a playful subtle wink, vibrant cute influencer pose"
+    }
+  ],
+  "voices": [
+    {
+      "id": "vi-VN-HoaiMyNeural",
+      "name": "Hoài My (Nữ miền Bắc - Dịu dàng, trong trẻo)",
+      "gender": "Female",
+      "lang": "vi-VN",
+      "sample": "Chào anh, hôm nay anh có khỏe không? Đi dạo phố cùng em nhé!"
+    },
+    {
+      "id": "vi-VN-NamMinhNeural",
+      "name": "Nam Minh (Nam miền Bắc - Trầm ấm, truyền cảm)",
+      "gender": "Male",
+      "lang": "vi-VN",
+      "sample": "Chào bạn, chào mừng bạn đã đến với thế giới sáng tạo số."
+    },
+    {
+      "id": "en-US-JennyNeural",
+      "name": "Jenny (Nữ Mỹ - Năng động, tự nhiên)",
+      "gender": "Female",
+      "lang": "en-US",
+      "sample": "Hey everyone, welcome back to my daily lifestyle vlog!"
+    },
+    {
+      "id": "ja-JP-NanamiNeural",
+      "name": "Nanami (Nữ Nhật - Dễ thương, phong cách anime)",
+      "gender": "Female",
+      "lang": "ja-JP",
+      "sample": "こんにちは！今日も一日お疲れ様でした。"
+    },
+    {
+      "id": "ko-KR-SunHiNeural",
+      "name": "Sun-Hi (Nữ Hàn - Ngọt ngào, nhẹ nhàng)",
+      "gender": "Female",
+      "lang": "ko-KR",
+      "sample": "안녕하세요! 오늘도 좋은 하루 보내세요."
+    }
+  ],
+  "caption_styles": [
+    {
+      "id": "flirty",
+      "name": "Thả thính ngọt ngào (Hút tim)",
+      "desc": "Câu từ nhẹ nhàng, ẩn ý dễ thương, làm người xem muốn tương tác bình luận."
+    },
+    {
+      "id": "lifestyle",
+      "name": "Tâm sự cuộc sống / Chill",
+      "desc": "Chia sẻ cảm xúc nhẹ nhàng về một ngày bình yên, tách cà phê hay góc phố."
+    },
+    {
+      "id": "fashion",
+      "name": "Thời trang & Outfit (OOTD)",
+      "desc": "Review trang phục, chia sẻ gu ăn mặc, hỏi ý kiến fan về set đồ hôm nay."
+    },
+    {
+      "id": "tiktok_script",
+      "name": "Kịch bản Video ngắn 15s (Hook + Body + CTA)",
+      "desc": "Kịch bản chuẩn cấu trúc video ngắn giữ chân người xem từ 3 giây đầu tiên."
+    }
+  ]
+}
