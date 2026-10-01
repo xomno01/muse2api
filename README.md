@@ -51,6 +51,27 @@
 
 ## 🚀 极速部署
 
+### 🇻🇳 Khởi Chạy 1-Click Trên Windows (Dành Cho Máy Phụ)
+
+Bản build này đã được tích hợp sẵn:
+- **Giao diện Tiếng Việt 100%** (kèm nút chuyển đổi nhanh `[ 🇻🇳 Tiếng Việt | 🇨🇳 中文 ]` cả trên Web Admin và Chrome Extension).
+- **Đầy đủ cấu hình & Cookie**: Đã đóng gói sẵn `.env` và `data/accounts.json` nên khi clone về máy phụ là chạy được ngay.
+- **Script chạy tự động 1-click**:
+
+1. **Clone repo về máy phụ**:
+   ```bash
+   git clone https://github.com/xomno01/muse2api.git
+   cd muse2api
+   ```
+2. **Chạy ngay**:
+   - Nhấp đúp chuột vào file `run.bat` (hoặc gõ `.\run.ps1` trong PowerShell).
+   - Script sẽ tự động kiểm tra Python, tạo Virtualenv (`.venv`), cài thư viện `requirements.txt`, bật UTF-8 và khởi chạy máy chủ.
+3. **Mở trang quản trị**:
+   - Truy cập: `http://127.0.0.1:18610/admin?key=m2a_admin_8888888888`
+   - Tài khoản và Cookie đã sẵn sàng sử dụng ngay!
+
+---
+
 ### 方式一：Docker Compose（推荐，一行命令开箱即用）
 
 1. **克隆代码并进入目录**：

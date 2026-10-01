@@ -119,6 +119,12 @@ class MuseEngine:
             except Exception:  # noqa: BLE001
                 self.proc.kill()
         self.proc = None
+        if self._log:
+            try:
+                self._log.close()
+            except Exception:  # noqa: BLE001
+                pass
+            self._log = None
 
     # ---------------- 页面 ----------------
     def _open_page(self):

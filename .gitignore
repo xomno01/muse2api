@@ -6,6 +6,7 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 build/
 develop-eggs/
@@ -23,14 +24,12 @@ wheels/
 .installed.cfg
 *.egg
 
-# Environment & Credentials
-.env
+# Environment & Credentials (Included for private backup)
 .env.local
 *.key
 *.pem
 
 # Runtime & User Data
-data/accounts.json
 data/tasks.json
 data/.installed_sha
 data/debug-*.json

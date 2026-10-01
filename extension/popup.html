@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="vi">
 <head>
 <meta charset="utf-8">
 <style>
@@ -8,11 +8,16 @@
   body{
     width:380px;margin:0;padding:16px 18px 18px;
     background:#0d1117;color:#e6edf3;
-    font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",
-         "Microsoft YaHei",sans-serif;
+    font:13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   }
-  h1{font-size:15px;margin:0 0 3px;display:flex;align-items:center;gap:7px}
+  .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  h1{font-size:15px;margin:0;display:flex;align-items:center;gap:7px}
   h1 .dot{width:8px;height:8px;border-radius:50%;background:#4f8cff}
+  .lang-btn{
+    background:#21262d;border:1px solid #30363d;color:#c9d1d9;
+    border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;
+  }
+  .lang-btn:hover{background:#30363d}
   .sub{color:#8b949e;font-size:11.5px;margin:0 0 14px}
   label{display:block;font-size:11.5px;color:#8b949e;margin:11px 0 4px}
   input{
@@ -21,13 +26,13 @@
     font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
   }
   input:focus{outline:none;border-color:#4f8cff}
-  button{
+  button.submit{
     width:100%;margin-top:16px;padding:11px;border:0;border-radius:8px;
     background:linear-gradient(180deg,#4f8cff,#3d7bf0);color:#fff;
     font-size:13.5px;font-weight:600;cursor:pointer;
   }
-  button:hover{filter:brightness(1.08)}
-  button:disabled{opacity:.55;cursor:default;filter:none}
+  button.submit:hover{filter:brightness(1.08)}
+  button.submit:disabled{opacity:.55;cursor:default;filter:none}
   .steps{background:#161b22;border:1px solid #30363d;border-radius:8px;
     padding:10px 12px;margin-top:14px;font-size:11.5px;color:#8b949e;line-height:1.75}
   .steps b{color:#e6edf3}
@@ -41,33 +46,33 @@
 </style>
 </head>
 <body>
-  <h1><span class="dot"></span>Muse2API Cookie 导入</h1>
-  <p class="sub">把当前浏览器里 muse.ai 的登录态，一键同步到你的 muse2api 服务。</p>
+  <div class="head">
+    <h1><span class="dot"></span><span id="t_title">Muse2API Nhập Cookie</span></h1>
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">🌐 Tiếng Việt</button>
+  </div>
+  <p class="sub" id="t_sub">Đồng bộ phiên đăng nhập muse.ai từ trình duyệt này sang máy chủ muse2api chỉ với 1 cú click.</p>
 
-  <label>服务地址（BASE URL）</label>
-  <input id="base" placeholder="http://your-server-ip:18610" spellcheck="false">
+  <label id="t_lbl_base">Địa chỉ máy chủ (BASE URL)</label>
+  <input id="base" placeholder="http://127.0.0.1:18610" spellcheck="false">
 
-  <label>API Key</label>
+  <label id="t_lbl_key">Khóa API (API Key)</label>
   <input id="key" placeholder="m2a_..." spellcheck="false">
 
-  <label>账号标签（可留空）</label>
-  <input id="label" placeholder="例如 muse-main" spellcheck="false">
+  <label id="t_lbl_label">Nhãn tài khoản (Tùy chọn)</label>
+  <input id="label" placeholder="Ví dụ: muse-chinh" spellcheck="false">
 
-  <button id="go">读取并导入</button>
+  <button class="submit" id="go">Đọc và Nhập Cookie</button>
 
-  <div class="steps">
-    <b>用之前先确认两件事：</b><br>
-    1. 你已经在<b>这个浏览器</b>里登录了 <a href="https://muse.ai/" target="_blank"
-       style="color:#4f8cff">muse.ai</a>（能看到聊天界面）。<br>
-    2. 上面的服务地址和 API Key 已填好（在 muse2api 管理页「账号池」页顶部可以复制）。
+  <div class="steps" id="t_steps">
+    <b>Trước khi bấm hãy xác nhận:</b><br>
+    1. Bạn đã đăng nhập sẵn vào <a href="https://muse.ai/" target="_blank" style="color:#4f8cff">muse.ai</a> trên <b>trình duyệt này</b> (thấy màn hình chat).<br>
+    2. Địa chỉ máy chủ và API Key đã được điền đúng (sao chép ở đầu trang Admin).
   </div>
 
   <div id="log"></div>
 
-  <div class="foot">
-    本扩展只做一件事：用浏览器的 <code>chrome.cookies</code> 接口读取 muse.ai 的
-    Cookie（能读到 httpOnly 的那些），POST 到你填的服务地址。
-    不收集、不上传到任何第三方服务器。
+  <div class="foot" id="t_foot">
+    Tiện ích chỉ đọc Cookie của muse.ai (bao gồm các khóa httpOnly) qua API <code>chrome.cookies</code> và gửi trực tiếp về máy chủ nội bộ của bạn. Không gửi về bất kỳ máy chủ bên thứ ba nào.
   </div>
 
   <script src="popup.js"></script>
