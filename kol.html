@@ -848,25 +848,61 @@
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title">🎯 Neo Khuôn Mặt (Face Anchor)</div>
-                <div class="card-sub">Bức ảnh chân dung gốc dùng làm "mẫu tham chiếu" cho mọi bức ảnh sau.</div>
+                <div class="card-title">📐 Bộ Pattern Đa Góc & Neo Diện Mạo</div>
+                <div class="card-sub">Khóa 4 góc hướng mặt và vóc dáng để AI vẽ luôn chuẩn xác một người.</div>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="triggerGenCharacterSheet()" title="Sinh ảnh Turnaround Model Sheet 360 độ">📸 Sheet 360°</button>
+            </div>
+
+            <!-- 4 Angle Anchors Grid -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px;">
+              <!-- 1. Front View -->
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+                <div style="font-size: 11px; font-weight: 600; color: #fff; margin-bottom: 6px;">🎯 Chính diện 0°</div>
+                <div id="slot_front" style="width: 100%; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--line); position: relative;">
+                  <span style="font-size: 10px; color: var(--text-muted);">Trống</span>
+                  <img id="img_slot_front" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+                </div>
+                <input type="file" id="file_slot_front" style="display: none;" accept="image/*" onchange="uploadAngleFile('front', this.files[0])" />
+                <button class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 6px; font-size: 10.5px; padding: 4px;" onclick="document.getElementById('file_slot_front').click()">Tải Ảnh</button>
+              </div>
+
+              <!-- 2. Three-Quarter View -->
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+                <div style="font-size: 11px; font-weight: 600; color: #fff; margin-bottom: 6px;">📐 Nghiêng 3/4 (45°)</div>
+                <div id="slot_three_quarter" style="width: 100%; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--line); position: relative;">
+                  <span style="font-size: 10px; color: var(--text-muted);">Trống</span>
+                  <img id="img_slot_three_quarter" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+                </div>
+                <input type="file" id="file_slot_three_quarter" style="display: none;" accept="image/*" onchange="uploadAngleFile('three_quarter', this.files[0])" />
+                <button class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 6px; font-size: 10.5px; padding: 4px;" onclick="document.getElementById('file_slot_three_quarter').click()">Tải Ảnh</button>
+              </div>
+
+              <!-- 3. Profile 90 View -->
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+                <div style="font-size: 11px; font-weight: 600; color: #fff; margin-bottom: 6px;">👤 Nghiêng 90°</div>
+                <div id="slot_profile" style="width: 100%; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--line); position: relative;">
+                  <span style="font-size: 10px; color: var(--text-muted);">Trống</span>
+                  <img id="img_slot_profile" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+                </div>
+                <input type="file" id="file_slot_profile" style="display: none;" accept="image/*" onchange="uploadAngleFile('profile', this.files[0])" />
+                <button class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 6px; font-size: 10.5px; padding: 4px;" onclick="document.getElementById('file_slot_profile').click()">Tải Ảnh</button>
+              </div>
+
+              <!-- 4. Full Body View -->
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+                <div style="font-size: 11px; font-weight: 600; color: #fff; margin-bottom: 6px;">🧍‍♀️ Toàn thân</div>
+                <div id="slot_full_body" style="width: 100%; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--line); position: relative;">
+                  <span style="font-size: 10px; color: var(--text-muted);">Trống</span>
+                  <img id="img_slot_full_body" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+                </div>
+                <input type="file" id="file_slot_full_body" style="display: none;" accept="image/*" onchange="uploadAngleFile('full_body', this.files[0])" />
+                <button class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 6px; font-size: 10.5px; padding: 4px;" onclick="document.getElementById('file_slot_full_body').click()">Tải Ảnh</button>
               </div>
             </div>
 
-            <div style="text-align: center; margin-bottom: 16px;">
-              <div id="anchorPreviewBox" style="width: 180px; height: 180px; border-radius: 50%; border: 3px solid var(--primary); margin: 0 auto; overflow: hidden; background: var(--surface); display: flex; align-items: center; justify-content: center;">
-                <span id="anchorPlaceholderText" style="color: var(--text-muted); font-size: 12px;">Chưa đặt Face Anchor</span>
-                <img id="anchorPreviewImg" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Tải ảnh chân dung mẫu lên (PNG/JPG/WebP):</label>
-              <input type="file" id="anchorFileInput" class="input-text" accept="image/*" onchange="uploadFaceAnchor(this.files[0])" />
-            </div>
-
-            <div class="form-group" style="margin-top: 10px;">
-              <button class="btn btn-secondary btn-block" onclick="generateFaceAnchorFromDna()">✨ Tự động sinh Face Anchor từ DNA bằng Muse</button>
+            <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.4; background: rgba(236,72,153,0.06); padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(236,72,153,0.15);">
+              💡 <b>Mẹo giữ nhất quán:</b> Bạn có thể bấm nút <b>"📸 Sheet 360°"</b> ở trên để AI tạo bảng mẫu xoay đa hướng đầy đủ từ đầu đến chân cho nhân vật.
             </div>
           </div>
         </div>
@@ -875,15 +911,39 @@
           <div class="card">
             <div class="card-header">
               <div>
-                <div class="card-title">🧬 DNA Chi Tiết & Nhân Cách</div>
-                <div class="card-sub">Thông số nhận dạng sinh học cố định của nhân vật đang chọn.</div>
+                <div class="card-title">🧬 Chỉ Số Vóc Dáng & DNA Nhận Dạng</div>
+                <div class="card-sub">Bộ thông số sinh học cố định để giữ vóc dáng và diện mạo không bao giờ lệch.</div>
               </div>
-              <button class="btn btn-secondary btn-sm" onclick="editCurrentKol()">Chỉnh Sửa</button>
+              <button class="btn btn-secondary btn-sm" onclick="editCurrentKol()">✏️ Chỉnh Sửa</button>
+            </div>
+
+            <!-- Biometric stats row -->
+            <div class="bento-grid" style="gap: 10px; margin-bottom: 14px;">
+              <div class="col-4" style="background: var(--surface); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--line);">
+                <div style="font-size: 11px; color: var(--text-muted);">📏 Chiều cao</div>
+                <div id="viewHeight" style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px;">165 cm</div>
+              </div>
+              <div class="col-4" style="background: var(--surface); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--line);">
+                <div style="font-size: 11px; color: var(--text-muted);">⚖️ Cân nặng</div>
+                <div id="viewWeight" style="font-size: 14px; font-weight: 700; color: #fff; margin-top: 2px;">47 kg</div>
+              </div>
+              <div class="col-4" style="background: var(--surface); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--line);">
+                <div style="font-size: 11px; color: var(--text-muted);">💃 Vóc dáng</div>
+                <div id="viewBodyType" style="font-size: 13px; font-weight: 700; color: var(--accent-pink); margin-top: 2px;">Mảnh mai</div>
+              </div>
+              <div class="col-6" style="background: var(--surface); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--line);">
+                <div style="font-size: 11px; color: var(--text-muted);">📐 Số đo 3 vòng</div>
+                <div id="viewThreeSizes" style="font-size: 13px; font-weight: 600; color: var(--accent-cyan); margin-top: 2px;">82 - 59 - 88</div>
+              </div>
+              <div class="col-6" style="background: var(--surface); padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--line);">
+                <div style="font-size: 11px; color: var(--text-muted);">✨ Làn da</div>
+                <div id="viewSkinTone" style="font-size: 13px; font-weight: 600; color: #fff; margin-top: 2px;">Trắng hồng tự nhiên</div>
+              </div>
             </div>
 
             <div class="form-group">
               <label class="form-label">DNA Prompt Cốt Lõi (Khuôn mặt, màu mắt, kiểu tóc, nét đặc trưng):</label>
-              <textarea id="viewDnaPrompt" class="textarea" readonly style="font-family: monospace; font-size: 12px;"></textarea>
+              <textarea id="viewDnaPrompt" class="textarea" readonly style="font-family: monospace; font-size: 12px; height: 90px;"></textarea>
             </div>
 
             <div class="bento-grid" style="gap: 12px;">
@@ -892,12 +952,12 @@
                 <div id="viewArchetype" style="font-weight: 600; color: #fff;">-</div>
               </div>
               <div class="col-6">
-                <div class="form-label">Giọng đọc ưa thích:</div>
+                <div class="form-label">Giọng đọc:</div>
                 <div id="viewVoice" style="font-weight: 600; color: var(--accent-cyan);">-</div>
               </div>
               <div class="col-12">
                 <div class="form-label">Tiểu sử & Tính cách:</div>
-                <div id="viewBio" style="font-size: 13px; color: var(--text-muted); line-height: 1.4;">-</div>
+                <div id="viewBio" style="font-size: 12.5px; color: var(--text-muted); line-height: 1.4;">-</div>
               </div>
             </div>
           </div>
@@ -992,6 +1052,16 @@
                 <input type="checkbox" id="chkUseAnchor" checked style="accent-color: var(--primary);" />
                 <span>Khóa Face Anchor (Giữ nguyên gương mặt bé KOL)</span>
               </label>
+            </div>
+
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label class="form-label" style="margin-bottom: 0;">📐 Góc Chụp Camera & Hướng Mặt:</label>
+                <span id="selectedAngleDesc" style="font-size: 11.5px; font-weight: 600; color: var(--accent-pink);">Góc Chính Diện (0°)</span>
+              </div>
+              <div id="cameraAnglesContainer" class="preset-chips">
+                <!-- Rendered via JS -->
+              </div>
             </div>
 
             <div class="form-group">
@@ -1368,6 +1438,48 @@
         </div>
       </div>
 
+      <!-- Biometric & Figure section -->
+      <div style="margin: 10px 0 6px; font-weight: 700; color: var(--accent-pink); font-size: 13px; display: flex; align-items: center; gap: 6px;">
+        <span>📏 Thông Số Vóc Dáng & Hình Thể (Cố định để giữ nhất quán):</span>
+      </div>
+      <div class="bento-grid" style="gap: 10px; margin-bottom: 12px;">
+        <div class="col-4">
+          <div class="form-group">
+            <label class="form-label">Chiều cao:</label>
+            <input type="text" id="modalHeight" class="input-text" placeholder="165 cm" value="165 cm" />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="form-group">
+            <label class="form-label">Cân nặng:</label>
+            <input type="text" id="modalWeight" class="input-text" placeholder="47 kg" value="47 kg" />
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="form-group">
+            <label class="form-label">Vóc dáng:</label>
+            <select id="modalBodyType" class="select">
+              <option value="slender" selected>Mảnh mai thanh thoát</option>
+              <option value="hourglass">Đồng hồ cát quyến rũ</option>
+              <option value="athletic">Thể thao săn chắc</option>
+              <option value="model_tall">Cao ráo siêu mẫu</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-group">
+            <label class="form-label">Số đo 3 vòng (Tùy chọn):</label>
+            <input type="text" id="modalThreeSizes" class="input-text" placeholder="82-59-88" value="82-59-88" />
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="form-group">
+            <label class="form-label">Làn da / Tông da:</label>
+            <input type="text" id="modalSkinTone" class="input-text" placeholder="Trắng hồng tự nhiên" value="Trắng hồng tự nhiên" />
+          </div>
+        </div>
+      </div>
+
       <div class="form-group">
         <label class="form-label">Câu Slogan / Tagline ngắn:</label>
         <input type="text" id="modalTagline" class="input-text" placeholder="Nàng thơ Hà Nội dịu dàng & thanh khiết" />
@@ -1406,6 +1518,7 @@
     let ACTIVE_KOL = null;
 
     let selectedSceneId = null;
+    let selectedAngleId = 'angle_front';
     let selectedMotionId = null;
     let selectedStyleId = null;
     let selectedScriptFormatId = null;
@@ -1461,6 +1574,34 @@
     // Render Presets
     function renderPresets() {
       if (!PRESETS) return;
+
+      // Camera Angles
+      const angWrap = document.getElementById('cameraAnglesContainer');
+      if (angWrap) {
+        angWrap.innerHTML = '';
+        (PRESETS.camera_angles || []).forEach((a, i) => {
+          const d = document.createElement('div');
+          d.className = 'preset-chip' + (i === 0 ? ' active' : '');
+          d.innerHTML = `<span>${a.name}</span>`;
+          d.onclick = () => {
+            document.querySelectorAll('#cameraAnglesContainer .preset-chip').forEach(c => c.classList.remove('active'));
+            d.classList.add('active');
+            selectedAngleId = a.id;
+            const descEl = document.getElementById('selectedAngleDesc');
+            if (descEl) descEl.textContent = a.name;
+            if (a.best_ratio) {
+              const rEl = document.getElementById('lookbookRatio');
+              if (rEl) rEl.value = a.best_ratio;
+            }
+          };
+          angWrap.appendChild(d);
+          if (i === 0) {
+            selectedAngleId = a.id;
+            const descEl = document.getElementById('selectedAngleDesc');
+            if (descEl) descEl.textContent = a.name;
+          }
+        });
+      }
 
       // Scenes
       const scWrap = document.getElementById('scenesContainer');
@@ -1599,23 +1740,48 @@
         }
       });
 
+      // Update Biometric Stats
+      const hEl = document.getElementById('viewHeight');
+      if (hEl) hEl.textContent = ACTIVE_KOL.height || '165 cm';
+      const wEl = document.getElementById('viewWeight');
+      if (wEl) wEl.textContent = ACTIVE_KOL.weight || '47 kg';
+      let bodyTypeName = ACTIVE_KOL.body_type || 'Mảnh mai';
+      if (PRESETS && PRESETS.body_types) {
+        const bt = PRESETS.body_types.find(b => b.id === ACTIVE_KOL.body_type);
+        if (bt) bodyTypeName = bt.name.split(' (')[0];
+      }
+      const btEl = document.getElementById('viewBodyType');
+      if (btEl) btEl.textContent = bodyTypeName;
+      const tsEl = document.getElementById('viewThreeSizes');
+      if (tsEl) tsEl.textContent = ACTIVE_KOL.three_sizes || '82-59-88';
+      const skEl = document.getElementById('viewSkinTone');
+      if (skEl) skEl.textContent = ACTIVE_KOL.skin_tone || 'Trắng hồng tự nhiên';
+
       // Update Detail view
       document.getElementById('viewDnaPrompt').value = ACTIVE_KOL.dna_prompt || '';
       document.getElementById('viewArchetype').textContent = `${ACTIVE_KOL.archetype || 'Nàng thơ'} (${ACTIVE_KOL.nationality || 'Việt Nam'})`;
       document.getElementById('viewVoice').textContent = ACTIVE_KOL.voice || 'vi-VN-HoaiMyNeural';
       document.getElementById('viewBio').textContent = ACTIVE_KOL.bio || 'Chưa có tiểu sử';
 
-      // Update Anchor view
-      const ancImg = document.getElementById('anchorPreviewImg');
-      const ancPh = document.getElementById('anchorPlaceholderText');
-      if (ACTIVE_KOL.face_anchor_url) {
-        ancImg.src = ACTIVE_KOL.face_anchor_url;
-        ancImg.style.display = 'block';
-        ancPh.style.display = 'none';
-      } else {
-        ancImg.style.display = 'none';
-        ancPh.style.display = 'block';
-      }
+      // Update 4 Multi-Angle Anchor Slots
+      const anchors = ACTIVE_KOL.multi_angle_anchors || {};
+      ['front', 'three_quarter', 'profile', 'full_body'].forEach(k => {
+        const img = document.getElementById(`img_slot_${k}`);
+        const slot = document.getElementById(`slot_${k}`);
+        const url = anchors[k] || (k === 'front' ? ACTIVE_KOL.face_anchor_url : null);
+        if (img && slot) {
+          const ph = slot.querySelector('span');
+          if (url) {
+            img.src = url;
+            img.style.display = 'block';
+            if (ph) ph.style.display = 'none';
+          } else {
+            img.src = '';
+            img.style.display = 'none';
+            if (ph) ph.style.display = 'inline';
+          }
+        }
+      });
 
       // Voice select default
       if (ACTIVE_KOL.voice) {
@@ -1625,25 +1791,59 @@
       loadGallery();
     }
 
-    // Upload Face Anchor
-    async function uploadFaceAnchor(file) {
+    // Upload Angle Anchor Slot
+    async function uploadAngleFile(angleKey, file) {
       if (!file || !ACTIVE_KOL) return;
       const formData = new FormData();
       formData.append('file', file);
       try {
-        toast('Đang tải Face Anchor lên...', 'info');
-        const res = await fetch(`/kol/api/profiles/${ACTIVE_KOL.id}/anchor`, {
+        toast(`Đang tải ảnh góc [${angleKey}] lên...`, 'info');
+        const res = await fetch(`/kol/api/profiles/${ACTIVE_KOL.id}/angle-anchor/${angleKey}`, {
           method: 'POST',
           body: formData
         }).then(r => r.json());
         if (res.status === 'ok') {
-          ACTIVE_KOL.face_anchor_url = res.anchor_url;
+          if (!ACTIVE_KOL.multi_angle_anchors) ACTIVE_KOL.multi_angle_anchors = {};
+          ACTIVE_KOL.multi_angle_anchors[angleKey] = res.anchor_url;
+          if (angleKey === 'front') {
+            ACTIVE_KOL.face_anchor_url = res.anchor_url;
+          }
           switchActiveKol(ACTIVE_KOL.id);
           renderProfilesList();
-          toast('Đã cập nhật Face Anchor thành công!', 'ok');
+          toast(`Đã khóa thành công góc [${angleKey}]!`, 'ok');
         }
       } catch (e) {
-        toast('Lỗi tải Face Anchor: ' + e, 'err');
+        toast('Lỗi tải ảnh góc: ' + e, 'err');
+      }
+    }
+
+    // Generate 360° Character Turnaround Model Sheet
+    async function triggerGenCharacterSheet() {
+      if (!ACTIVE_KOL) return toast('Vui lòng chọn bé KOL trước', 'err');
+      try {
+        toast(`Đang yêu cầu Muse vẽ bảng mẫu Model Sheet 360° cho ${ACTIVE_KOL.name}... (khoảng 20s)`, 'info');
+        const res = await fetch('/kol/api/generate-character-sheet', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ profile_id: ACTIVE_KOL.id, aspect_ratio: '16:9' })
+        }).then(r => r.json());
+
+        if (res.status === 'success' && res.url) {
+          toast('🎉 Đã tạo thành công Bảng Mẫu Đa Hướng 360°!', 'ok');
+          if (!ACTIVE_KOL.face_anchor_url) {
+            ACTIVE_KOL.face_anchor_url = res.url;
+            if (!ACTIVE_KOL.multi_angle_anchors) ACTIVE_KOL.multi_angle_anchors = {};
+            ACTIVE_KOL.multi_angle_anchors.front = res.url;
+            switchActiveKol(ACTIVE_KOL.id);
+            renderProfilesList();
+          }
+          loadGallery();
+          window.open(res.url, '_blank');
+        } else {
+          throw new Error(res.detail || 'Không thể tạo character sheet');
+        }
+      } catch (e) {
+        toast('Lỗi tạo Character Sheet: ' + e.message, 'err');
       }
     }
 
@@ -1655,6 +1855,11 @@
       document.getElementById('modalAge').value = 21;
       document.getElementById('modalArchetype').value = '';
       document.getElementById('modalNationality').value = 'Việt Nam';
+      document.getElementById('modalHeight').value = '165 cm';
+      document.getElementById('modalWeight').value = '47 kg';
+      document.getElementById('modalBodyType').value = 'slender';
+      document.getElementById('modalThreeSizes').value = '82-59-88';
+      document.getElementById('modalSkinTone').value = 'Trắng hồng tự nhiên';
       document.getElementById('modalTagline').value = '';
       document.getElementById('modalDnaPrompt').value = '';
       document.getElementById('modalBio').value = '';
@@ -1670,6 +1875,11 @@
       document.getElementById('modalAge').value = ACTIVE_KOL.age || 21;
       document.getElementById('modalArchetype').value = ACTIVE_KOL.archetype || '';
       document.getElementById('modalNationality').value = ACTIVE_KOL.nationality || 'Việt Nam';
+      document.getElementById('modalHeight').value = ACTIVE_KOL.height || '165 cm';
+      document.getElementById('modalWeight').value = ACTIVE_KOL.weight || '47 kg';
+      document.getElementById('modalBodyType').value = ACTIVE_KOL.body_type || 'slender';
+      document.getElementById('modalThreeSizes').value = ACTIVE_KOL.three_sizes || '82-59-88';
+      document.getElementById('modalSkinTone').value = ACTIVE_KOL.skin_tone || 'Trắng hồng tự nhiên';
       document.getElementById('modalTagline').value = ACTIVE_KOL.tagline || '';
       document.getElementById('modalDnaPrompt').value = ACTIVE_KOL.dna_prompt || '';
       document.getElementById('modalBio').value = ACTIVE_KOL.bio || '';
@@ -1694,6 +1904,11 @@
         age: parseInt(document.getElementById('modalAge').value) || 21,
         archetype: document.getElementById('modalArchetype').value,
         nationality: document.getElementById('modalNationality').value,
+        height: document.getElementById('modalHeight').value.trim() || '165 cm',
+        weight: document.getElementById('modalWeight').value.trim() || '47 kg',
+        body_type: document.getElementById('modalBodyType').value || 'slender',
+        three_sizes: document.getElementById('modalThreeSizes').value.trim() || '82-59-88',
+        skin_tone: document.getElementById('modalSkinTone').value.trim() || 'Trắng hồng tự nhiên',
         tagline: document.getElementById('modalTagline').value,
         dna_prompt: dna,
         bio: document.getElementById('modalBio').value,
@@ -1738,6 +1953,7 @@
       const payload = {
         profile_id: ACTIVE_KOL.id,
         scene_id: selectedSceneId,
+        angle_id: selectedAngleId || 'angle_front',
         custom_prompt: document.getElementById('customLookbookPrompt').value.trim(),
         aspect_ratio: document.getElementById('lookbookRatio').value,
         use_face_anchor: document.getElementById('chkUseAnchor').checked
@@ -1775,9 +1991,30 @@
     async function setAsAnchorFromGen() {
       if (!currentGeneratedImageUrl || !ACTIVE_KOL) return;
       try {
-        const blob = await fetch(currentGeneratedImageUrl).then(r => r.blob());
-        const file = new File([blob], 'anchor.png', {type: blob.type});
-        await uploadFaceAnchor(file);
+        let targetKey = 'front';
+        if (selectedAngleId === 'angle_three_quarter') targetKey = 'three_quarter';
+        else if (selectedAngleId === 'angle_profile_90') targetKey = 'profile';
+        else if (selectedAngleId === 'angle_full_body') targetKey = 'full_body';
+
+        toast(`Đang đặt ảnh làm Neo [${targetKey}]...`, 'info');
+        const res = await fetch('/kol/api/set-angle-anchor', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            profile_id: ACTIVE_KOL.id,
+            angle_key: targetKey,
+            image_url: currentGeneratedImageUrl
+          })
+        }).then(r => r.json());
+
+        if (res.status === 'ok') {
+          if (!ACTIVE_KOL.multi_angle_anchors) ACTIVE_KOL.multi_angle_anchors = {};
+          ACTIVE_KOL.multi_angle_anchors[targetKey] = currentGeneratedImageUrl;
+          if (targetKey === 'front') ACTIVE_KOL.face_anchor_url = currentGeneratedImageUrl;
+          switchActiveKol(ACTIVE_KOL.id);
+          renderProfilesList();
+          toast(`Đã gán ảnh thành công vào slot [${targetKey}]!`, 'ok');
+        }
       } catch (e) {
         toast('Lỗi đặt Anchor: ' + e, 'err');
       }
@@ -2141,6 +2378,7 @@
       const payload = {
         profile_id: ACTIVE_KOL.id,
         user_idea: idea,
+        angle_id: selectedAngleId || 'angle_front',
         duration: parseInt(document.getElementById('autoProdDuration').value) || 5,
         aspect_ratio: document.getElementById('autoProdAspect').value || '9:16',
         use_face_anchor: document.getElementById('autoProdFaceAnchor').checked,

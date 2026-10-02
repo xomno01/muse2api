@@ -261,6 +261,90 @@
       "name": "Thử thách hài hước / Troll nhẹ nhàng",
       "desc": "Thử thách người đi đường hoặc nhờ vả những việc khó nhằn với phản ứng bất ngờ."
     }
+  ],
+  "camera_angles": [
+    {
+      "id": "angle_front",
+      "name": "Góc Chính Diện (0° Front Portrait)",
+      "desc": "Nhìn thẳng ống kính, gương mặt cân đối, ánh nhìn trực diện thu hút.",
+      "prompt_addon": "frontal eye-level portrait shot, looking directly into the camera lens with engaging eye contact, perfectly centered composition, symmetrical facial features",
+      "best_ratio": "1:1"
+    },
+    {
+      "id": "angle_three_quarter",
+      "name": "Góc Nghiêng 3/4 Điện Ảnh (45° Three-Quarter View)",
+      "desc": "Góc quay vàng điện ảnh, tôn đường viền hàm, xương gò má và sống mũi thon gọn.",
+      "prompt_addon": "three-quarter 45-degree angle profile shot, elegant head turn, highlighting defined cheekbones and jawline contour, cinematic editorial portrait lighting",
+      "best_ratio": "9:16"
+    },
+    {
+      "id": "angle_profile_90",
+      "name": "Góc Nghiêng Hoàn Toàn (90° Side Profile)",
+      "desc": "Góc nghiêng 90 độ, thấy rõ sống mũi cao thanh thoát, đường cong đôi môi và cổ dài kiêu sa.",
+      "prompt_addon": "true 90-degree side profile silhouette view, looking sideways into distance, sharply defined nose bridge, sculpted lips and elegant neck posture",
+      "best_ratio": "9:16"
+    },
+    {
+      "id": "angle_full_body",
+      "name": "Toàn Thân Khoe Dáng (Full Body Silhouette)",
+      "desc": "Bắt trọn từ đầu đến chân, thể hiện chuẩn xác chiều cao, vóc dáng và trang phục.",
+      "prompt_addon": "full body head-to-toe standing fashion shot, clearly showcasing full body proportions, height silhouette, elegant posture, complete outfit and shoes framing",
+      "best_ratio": "9:16"
+    },
+    {
+      "id": "angle_medium_waist",
+      "name": "Bán Thân Tự Nhiên (Medium Shot / Waist-Up)",
+      "desc": "Góc ngang thắt lưng, cử chỉ tay tự nhiên, phù hợp quay vlog và phỏng vấn.",
+      "prompt_addon": "medium waist-up lifestyle shot, natural body language and hand gestures, balanced upper body framing, beautiful shallow depth of field",
+      "best_ratio": "3:4"
+    },
+    {
+      "id": "angle_close_up",
+      "name": "Cận Cảnh Chi Tiết Gương Mặt (Macro Close-Up)",
+      "desc": "Góc quay siêu gần tập trung vào đôi mắt lấp lánh, nốt ruồi duyên, bờ môi và làn da căng mịn.",
+      "prompt_addon": "intimate macro beauty close-up shot, extreme focus on sparkling eyes, delicate skin pores texture, lips, and subtle facial micro-expressions, 85mm prime lens bokeh",
+      "best_ratio": "1:1"
+    },
+    {
+      "id": "angle_low_angle",
+      "name": "Góc Hất Từ Dưới Lên (Dramatic Low-Angle)",
+      "desc": "Góc máy thấp tôn vóc dáng cao ráo, đôi chân thon dài và phong thái quyền lực thời thượng.",
+      "prompt_addon": "dramatic low-angle upward perspective, fashionable dynamic pose looking slightly down at viewer, elongating leg proportions and towering model stature",
+      "best_ratio": "9:16"
+    },
+    {
+      "id": "angle_high_angle",
+      "name": "Góc Nhìn Từ Trên Xuống (Cute High-Angle / Selfie)",
+      "desc": "Góc máy từ trên cao nhìn xuống, đôi mắt to tròn long lanh, phong cách selfie đáng yêu.",
+      "prompt_addon": "charming high-angle downward perspective, looking up with large expressive eyes, aesthetic selfie viewpoint, youthful and sweet aura",
+      "best_ratio": "1:1"
+    }
+  ],
+  "body_types": [
+    {
+      "id": "slender",
+      "name": "Mảnh mai thanh thoát (Slender & Petite)",
+      "desc": "Dáng người mình hạc xương mai, thon gọn, thanh khiết, phong cách nàng thơ dịu dàng.",
+      "prompt_snippet": "slender delicate feminine physique, graceful thin waist, petite silhouette, soft natural curves"
+    },
+    {
+      "id": "hourglass",
+      "name": "Đồng hồ cát quyến rũ (Curvy Hourglass)",
+      "desc": "Vòng eo con kiến, ngực và hông nở nang, dáng chuẩn quyến rũ thu hút mọi ánh nhìn.",
+      "prompt_snippet": "stunning hourglass body proportions, slim tiny waist, feminine curves, attractive aesthetic silhouette"
+    },
+    {
+      "id": "athletic",
+      "name": "Thể thao săn chắc (Athletic & Toned)",
+      "desc": "Cơ bụng số 11 săn chắc, đôi chân thon dài khỏe khoắn, tràn đầy sức sống.",
+      "prompt_snippet": "athletic toned fit physique, visible faint 11-line abs definition, healthy muscular curves, energetic posture"
+    },
+    {
+      "id": "model_tall",
+      "name": "Cao ráo siêu mẫu (Tall Runway Model)",
+      "desc": "Đôi chân dài miên man, tỷ lệ cơ thể 9 đầu chuẩn runway quốc tế, thần thái ngút ngàn.",
+      "prompt_snippet": "tall runway model proportions, long legs, high fashion stature, elegant elongated posture"
+    }
   ]
 }
 

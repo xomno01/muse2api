@@ -6,13 +6,24 @@
     "age": 21,
     "archetype": "Nàng thơ / Nữ sinh thanh lịch",
     "nationality": "Việt Nam",
+    "height": "165 cm",
+    "weight": "47 kg",
+    "body_type": "slender",
+    "three_sizes": "82-59-88",
+    "skin_tone": "Trắng hồng tự nhiên (Fair porcelain)",
     "voice": "vi-VN-HoaiMyNeural",
-    "dna_prompt": "A gorgeous 21-year-old Vietnamese girl named Linh Dan, gentle oval face, naturally soft double eyelids, charming tiny mole below her left eye, long silky black wavy hair flowing naturally, delicate and soft facial features, radiant porcelain skin, warm and sweet smile, elegant Vietnamese aesthetic, ultra-realistic portrait, 8k resolution, raw photo quality",
+    "dna_prompt": "A gorgeous 21-year-old Vietnamese girl named Linh Dan, gentle oval face, naturally soft double eyelids, charming tiny mole below her left eye, long silky black wavy hair flowing naturally, delicate and soft facial features, radiant porcelain skin, warm and sweet smile, height 165cm, 47kg, slender petite silhouette, elegant Vietnamese aesthetic, ultra-realistic portrait, 8k resolution, raw photo quality",
     "negative_prompt": "ugly, deformed, disfigured, extra limbs, blur, bad anatomy, text, watermark, signature, logo, plastic skin, oversaturated",
     "bio": "Sinh viên ngành thiết kế tại Hà Nội, mê cà phê phố cổ, thích đọc sách, chụp ảnh film và diện váy hoa vintage.",
     "personality_tone": "Dịu dàng, tinh tế, thích dùng từ ngữ nhẹ nhàng, xưng hô 'em' và gọi người theo dõi là 'cả nhà' hoặc 'anh/chị'.",
     "created_at": 1790863972,
     "face_anchor_url": "/kol/media/anchors/char_linh_dan_anchor.webp",
+    "multi_angle_anchors": {
+      "front": "/kol/media/anchors/char_linh_dan_anchor.webp",
+      "three_quarter": null,
+      "profile": null,
+      "full_body": null
+    },
     "gallery_count": 0
   },
   {
@@ -22,13 +33,24 @@
     "age": 23,
     "archetype": "Fashionista / Sang chảnh",
     "nationality": "Việt Nam",
+    "height": "172 cm",
+    "weight": "52 kg",
+    "body_type": "hourglass",
+    "three_sizes": "86-61-92",
+    "skin_tone": "Trắng sáng căng bóng (Glass skin)",
     "voice": "vi-VN-HoaiMyNeural",
-    "dna_prompt": "A stunning 23-year-old modern Vietnamese fashion model named Bao Sam, sharp elegant V-line jaw, alluring cat eyes, full plump lips, stylish shoulder-length layered ash-brown hair, confident charismatic expression, flawless glowing glass skin, high-end luxury fashion vibe, studio portrait, 8k, photorealistic",
+    "dna_prompt": "A stunning 23-year-old modern Vietnamese fashion model named Bao Sam, sharp elegant V-line jaw, alluring cat eyes, full plump lips, stylish shoulder-length layered ash-brown hair, confident charismatic expression, height 172cm, 52kg, tall curvy hourglass runway model silhouette, flawless glowing glass skin, high-end luxury fashion vibe, studio portrait, 8k, photorealistic",
     "negative_prompt": "ugly, deformed, disfigured, extra limbs, blur, bad anatomy, text, watermark, signature, logo, plastic skin",
     "bio": "KOL thời trang và phong cách sống cao cấp tại TP.HCM, chuyên review đồ hiệu, nghỉ dưỡng resort 5 sao và dự tiệc tối.",
     "personality_tone": "Tự tin, sang xịn mịn, tràn đầy năng lượng, phong cách nói chuyện cuốn hút và sành điệu.",
     "created_at": 1790863972,
     "face_anchor_url": null,
+    "multi_angle_anchors": {
+      "front": null,
+      "three_quarter": null,
+      "profile": null,
+      "full_body": null
+    },
     "gallery_count": 0
   },
   {
@@ -38,13 +60,24 @@
     "age": 22,
     "archetype": "Cyberpunk / Streetwear Rebel",
     "nationality": "Việt Nam",
+    "height": "162 cm",
+    "weight": "46 kg",
+    "body_type": "slender",
+    "three_sizes": "80-58-86",
+    "skin_tone": "Trắng sáng lạnh (Cool fair)",
     "voice": "vi-VN-HoaiMyNeural",
-    "dna_prompt": "A trendy 22-year-old rebellious Vietnamese girl named Mia, cool edgy facial expression, sharp piercing gaze, short platinum bob haircut with subtle purple highlights, slight smirk, modern techwear aesthetic, neon city ambiance, ultra-detailed 8k, cinematic photo",
+    "dna_prompt": "A trendy 22-year-old rebellious Vietnamese girl named Mia, cool edgy facial expression, sharp piercing gaze, short platinum bob haircut with subtle purple highlights, slight smirk, height 162cm, 46kg, petite slender techwear build, modern street aesthetic, neon city ambiance, ultra-detailed 8k, cinematic photo",
     "negative_prompt": "ugly, deformed, disfigured, extra limbs, blur, bad anatomy, text, watermark, signature, logo",
     "bio": "DJ kiêm nhà sản xuất âm nhạc điện tử, mê văn hóa Y2K, trang phục techwear và những con phố ngập tràn ánh đèn neon.",
     "personality_tone": "Ngầu, thẳng thắn, hài hước kiểu gen Z, hay dùng từ lóng và icon năng động.",
     "created_at": 1790863972,
     "face_anchor_url": null,
+    "multi_angle_anchors": {
+      "front": null,
+      "three_quarter": null,
+      "profile": null,
+      "full_body": null
+    },
     "gallery_count": 0
   },
   {
@@ -54,13 +87,24 @@
     "age": 24,
     "archetype": "Sporty / Fitness Model",
     "nationality": "Việt Nam",
+    "height": "168 cm",
+    "weight": "53 kg",
+    "body_type": "athletic",
+    "three_sizes": "85-62-90",
+    "skin_tone": "Bánh mật khỏe khoắn (Sun-kissed honey)",
     "voice": "vi-VN-HoaiMyNeural",
-    "dna_prompt": "An athletic attractive 24-year-old Vietnamese fitness influencer named Mai Anh, healthy sun-kissed skin tone, bright cheerful radiant smile, defined toned jawline, high sleek ponytail, sparkling expressive eyes, sporty aesthetic, natural gym lighting, 8k resolution, crisp detail",
+    "dna_prompt": "An athletic attractive 24-year-old Vietnamese fitness influencer named Mai Anh, healthy sun-kissed skin tone, bright cheerful radiant smile, defined toned jawline, high sleek ponytail, sparkling expressive eyes, height 168cm, 53kg, athletic fit physique with 11-line abs, sporty aesthetic, natural gym lighting, 8k resolution, crisp detail",
     "negative_prompt": "ugly, deformed, disfigured, extra limbs, blur, bad anatomy, text, watermark, signature, logo",
     "bio": "Huấn luyện viên Pilates & Gym, truyền cảm hứng sống khỏe, ăn sạch (eat clean) và thói quen tích cực mỗi ngày.",
     "personality_tone": "Tràn đầy nhiệt huyết, tích cực, truyền động lực, giọng văn thân thiện như cô bạn thân.",
     "created_at": 1790863972,
     "face_anchor_url": null,
+    "multi_angle_anchors": {
+      "front": null,
+      "three_quarter": null,
+      "profile": null,
+      "full_body": null
+    },
     "gallery_count": 0
   }
 ]

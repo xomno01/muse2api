@@ -92,16 +92,34 @@ class ProfileCreateReq(BaseModel):
     age: Optional[int] = 21
     archetype: Optional[str] = "Nàng thơ"
     nationality: Optional[str] = "Việt Nam"
+    height: Optional[str] = "165 cm"
+    weight: Optional[str] = "47 kg"
+    body_type: Optional[str] = "slender"
+    three_sizes: Optional[str] = "82-59-88"
+    skin_tone: Optional[str] = "Trắng hồng tự nhiên"
     voice: Optional[str] = "vi-VN-HoaiMyNeural"
     dna_prompt: str
     negative_prompt: Optional[str] = ""
     bio: Optional[str] = ""
     personality_tone: Optional[str] = ""
+    multi_angle_anchors: Optional[dict] = None
+
+
+class SetAngleAnchorReq(BaseModel):
+    profile_id: str
+    angle_key: str  # front, three_quarter, profile, full_body
+    image_url: Optional[str] = None
+
+
+class CharacterSheetReq(BaseModel):
+    profile_id: str
+    aspect_ratio: Optional[str] = "16:9"
 
 
 class GenerateImageReq(BaseModel):
     profile_id: str
     scene_id: Optional[str] = None
+    angle_id: Optional[str] = "angle_front"
     custom_prompt: Optional[str] = ""
     aspect_ratio: Optional[str] = "1:1"
     use_face_anchor: Optional[bool] = True
@@ -145,6 +163,7 @@ class ScriptReq(BaseModel):
 class AutoProduceReq(BaseModel):
     profile_id: str
     user_idea: str
+    angle_id: Optional[str] = "auto"
     duration: Optional[int] = 5
     aspect_ratio: Optional[str] = "9:16"
     voice_id: Optional[str] = None
@@ -184,6 +203,11 @@ def save_profile(req: ProfileCreateReq):
         "age": req.age,
         "archetype": req.archetype,
         "nationality": req.nationality,
+        "height": req.height or (existing.get("height") if existing else "165 cm"),
+        "weight": req.weight or (existing.get("weight") if existing else "47 kg"),
+        "body_type": req.body_type or (existing.get("body_type") if existing else "slender"),
+        "three_sizes": req.three_sizes or (existing.get("three_sizes") if existing else "82-59-88"),
+        "skin_tone": req.skin_tone or (existing.get("skin_tone") if existing else "Trắng hồng tự nhiên"),
         "voice": req.voice or "vi-VN-HoaiMyNeural",
         "dna_prompt": req.dna_prompt,
         "negative_prompt": req.negative_prompt,
@@ -192,6 +216,12 @@ def save_profile(req: ProfileCreateReq):
         "updated_at": now,
         "created_at": existing.get("created_at", now) if existing else now,
         "face_anchor_url": existing.get("face_anchor_url", None) if existing else None,
+        "multi_angle_anchors": req.multi_angle_anchors or (existing.get("multi_angle_anchors") if existing else {
+            "front": existing.get("face_anchor_url") if existing else None,
+            "three_quarter": None,
+            "profile": None,
+            "full_body": None,
+        }),
         "gallery_count": existing.get("gallery_count", 0) if existing else 0,
     }
     if existing:
@@ -223,13 +253,112 @@ async def upload_anchor(profile_id: str, file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, f)
     anchor_url = f"/kol/media/anchors/{filename}"
     profile["face_anchor_url"] = anchor_url
+    if "multi_angle_anchors" not in profile or not isinstance(profile["multi_angle_anchors"], dict):
+        profile["multi_angle_anchors"] = {}
+    profile["multi_angle_anchors"]["front"] = anchor_url
     _save_profiles(profiles)
     return {"status": "ok", "anchor_url": anchor_url}
 
 
+@router.post("/profiles/{profile_id}/angle-anchor/{angle_key}")
+async def upload_angle_anchor(profile_id: str, angle_key: str, file: UploadFile = File(...)):
+    profiles = _load_profiles()
+    profile = next((p for p in profiles if p["id"] == profile_id), None)
+    if not profile:
+        raise HTTPException(404, "Không tìm thấy hồ sơ KOL")
+    if angle_key not in ("front", "three_quarter", "profile", "full_body"):
+        raise HTTPException(400, "Góc không hợp lệ (hỗ trợ: front, three_quarter, profile, full_body)")
+    ext = os.path.splitext(file.filename or "")[1].lower() or ".webp"
+    filename = f"{profile_id}_{angle_key}{ext}"
+    dest = os.path.join(ANCHORS_DIR, filename)
+    with open(dest, "wb") as f:
+        shutil.copyfileobj(file.file, f)
+    anchor_url = f"/kol/media/anchors/{filename}"
+    if "multi_angle_anchors" not in profile or not isinstance(profile["multi_angle_anchors"], dict):
+        profile["multi_angle_anchors"] = {}
+    profile["multi_angle_anchors"][angle_key] = anchor_url
+    if angle_key == "front":
+        profile["face_anchor_url"] = anchor_url
+    _save_profiles(profiles)
+    return {"status": "ok", "anchor_url": anchor_url, "angle_key": angle_key, "multi_angle_anchors": profile["multi_angle_anchors"]}
+
+
+@router.post("/set-angle-anchor")
+def set_angle_anchor(req: SetAngleAnchorReq):
+    profiles = _load_profiles()
+    profile = next((p for p in profiles if p["id"] == req.profile_id), None)
+    if not profile:
+        raise HTTPException(404, "Không tìm thấy hồ sơ KOL")
+    if req.angle_key not in ("front", "three_quarter", "profile", "full_body"):
+        raise HTTPException(400, "Góc không hợp lệ (hỗ trợ: front, three_quarter, profile, full_body)")
+    if "multi_angle_anchors" not in profile or not isinstance(profile["multi_angle_anchors"], dict):
+        profile["multi_angle_anchors"] = {}
+    profile["multi_angle_anchors"][req.angle_key] = req.image_url
+    if req.angle_key == "front":
+        profile["face_anchor_url"] = req.image_url
+    _save_profiles(profiles)
+    return {"status": "ok", "multi_angle_anchors": profile["multi_angle_anchors"]}
+
+
+@router.post("/generate-character-sheet")
+async def generate_character_sheet(req: CharacterSheetReq):
+    """Tạo bảng mẫu xoay đa hướng 360 độ (Turnaround Model Sheet) để khóa khuôn mặt và vóc dáng nhân vật."""
+    from app import CFG, _run_generation, media_url, ImageRequest, build_image_prompt
+
+    profiles = _load_profiles()
+    profile = next((p for p in profiles if p["id"] == req.profile_id), None)
+    if not profile:
+        raise HTTPException(404, "Không tìm thấy hồ sơ KOL")
+
+    presets = _load_presets()
+    b_types = {b["id"]: b for b in presets.get("body_types", [])}
+    b_info = b_types.get(profile.get("body_type", "slender"))
+    b_desc = b_info["prompt_snippet"] if b_info else profile.get("body_type", "slender")
+
+    h = profile.get("height", "165cm")
+    w = profile.get("weight", "47kg")
+    skin = profile.get("skin_tone", "fair porcelain skin")
+
+    sheet_prompt = f"Character turnaround model sheet of {profile['name']}, {profile.get('dna_prompt', '')}, exact height {h}, weight {w}, {b_desc}, {skin}, displaying 4 distinct angles in a clean multi-view lineup: 1. Full body front view, 2. Three-quarter 45-degree angle view, 3. True 90-degree side profile silhouette, 4. Intimate facial close-up portrait with natural micro-expressions. Same person, identical facial landmarks, consistent casual minimalist outfit, neutral gray studio backdrop, balanced professional lighting, photorealistic 8k, raw color film aesthetic, character design reference sheet, ultra-sharp detail"
+
+    img_req = ImageRequest(
+        prompt=sheet_prompt,
+        aspect_ratio=req.aspect_ratio or "16:9",
+        reference_image=None
+    )
+    api_prompt = build_image_prompt(img_req)
+
+    try:
+        res, acc_id = _run_generation(
+            api_prompt,
+            kind="image",
+            timeout=CFG.image_timeout,
+            reference_image=None
+        )
+        url = media_url(res["filename"])
+
+        # Save to profile gallery
+        p_gallery = os.path.join(GALLERY_DIR, req.profile_id)
+        os.makedirs(p_gallery, exist_ok=True)
+        media_src = os.path.join(BASE_DIR, "data", "media", res["filename"])
+        if os.path.exists(media_src):
+            shutil.copy2(media_src, os.path.join(p_gallery, res["filename"]))
+
+        return {
+            "status": "success",
+            "url": url,
+            "filename": res["filename"],
+            "prompt": sheet_prompt,
+            "account": acc_id
+        }
+    except Exception as exc:
+        log.exception("[KOL] Character sheet generation error: %s", exc)
+        raise HTTPException(500, f"Tạo bảng mẫu đa hướng thất bại: {exc}") from exc
+
+
 @router.post("/generate-image")
 async def generate_lookbook_image(req: GenerateImageReq, request: Request):
-    from app import CFG, _run_generation, media_url, store
+    from app import CFG, _run_generation, media_url, store, ImageRequest, build_image_prompt
 
     profiles = _load_profiles()
     profile = next((p for p in profiles if p["id"] == req.profile_id), None)
@@ -239,25 +368,55 @@ async def generate_lookbook_image(req: GenerateImageReq, request: Request):
     presets = _load_presets()
     scenes = {s["id"]: s for s in presets.get("lookbook_scenes", [])}
     scene = scenes.get(req.scene_id) if req.scene_id else None
+    angles = {a["id"]: a for a in presets.get("camera_angles", [])}
+    angle = angles.get(req.angle_id) if req.angle_id else None
 
-    # Synthesize prompt
+    b_types = {b["id"]: b for b in presets.get("body_types", [])}
+    b_info = b_types.get(profile.get("body_type", "slender"))
+    b_desc = b_info["prompt_snippet"] if b_info else profile.get("body_type", "slender")
+
+    # Synthesize prompt with full biometric & angle consistency
     parts = []
     if profile.get("dna_prompt"):
         parts.append(profile["dna_prompt"].strip())
+
+    # Biometrics: height, weight, body_type, skin
+    bio_specs = []
+    if profile.get("height"):
+        bio_specs.append(f"height {profile['height']}")
+    if profile.get("weight"):
+        bio_specs.append(f"weight {profile['weight']}")
+    if b_desc:
+        bio_specs.append(b_desc)
+    if profile.get("three_sizes"):
+        bio_specs.append(f"body measurements {profile['three_sizes']}")
+    if profile.get("skin_tone"):
+        bio_specs.append(profile["skin_tone"])
+    if bio_specs:
+        parts.append(", ".join(bio_specs))
+
+    # Angle & Perspective
+    if angle and angle.get("prompt_addon"):
+        parts.append(angle["prompt_addon"].strip())
+
+    # Scene
     if scene and scene.get("prompt_addon"):
         parts.append(scene["prompt_addon"].strip())
     if req.custom_prompt:
         parts.append(req.custom_prompt.strip())
 
-    ratio = req.aspect_ratio or (scene.get("best_ratio") if scene else "1:1")
-    parts.append(f"【Khung hình và tỉ lệ】: {ratio} aspect ratio")
-    parts.append("【Chất lượng】: photorealistic raw color film aesthetic, ultra-sharp 8k, flawless natural skin, beautiful lighting, completely clean without text or watermark")
+    ratio = req.aspect_ratio or (angle.get("best_ratio") if angle else (scene.get("best_ratio") if scene else "1:1"))
 
-    final_prompt = "，".join(parts)
+    combined_prompt = "，".join(parts)
+    img_req = ImageRequest(
+        prompt=combined_prompt,
+        aspect_ratio=ratio,
+        reference_image=None
+    )
+    final_prompt = build_image_prompt(img_req)
 
     ref_img_path = None
     if req.use_face_anchor and profile.get("face_anchor_url"):
-        # Convert relative anchor url to local path or keep reference
         anchor_fn = os.path.basename(profile["face_anchor_url"])
         local_anchor = os.path.join(ANCHORS_DIR, anchor_fn)
         if os.path.exists(local_anchor):
@@ -846,8 +1005,16 @@ def _run_auto_produce_worker(task_id: str, req: AutoProduceReq):
         if not acc:
             raise RuntimeError("Chưa có tài khoản Muse nào khả dụng")
 
+        h = profile.get("height", "165 cm")
+        w = profile.get("weight", "47 kg")
+        b_type = profile.get("body_type", "slender")
+        sizes = profile.get("three_sizes", "82-59-88")
+        skin = profile.get("skin_tone", "Trắng hồng tự nhiên")
+        biometrics_desc = f"Chiều cao: {h}, Cân nặng: {w}, Vóc dáng: {b_type}, Số đo: {sizes}, Da: {skin}"
+
         prompt = f"""Bạn là Giám đốc Sáng tạo chuyên sản xuất Short Video / Reel TikTok triệu view cho KOL Ảo.
 Nhân vật: {profile['name']} ({profile.get('age', 21)} tuổi, {profile.get('archetype', 'Nàng thơ')}).
+Thông số nhân trắc học & vóc dáng: {biometrics_desc}
 Tính cách: {profile.get('personality_tone', 'Hài hước, duyên dáng')}
 DNA ngoại hình: {profile.get('dna_prompt', '')[:220]}
 
@@ -862,7 +1029,7 @@ HÃY XUẤT RA CHÍNH XÁC 5 PHẦN THEO ĐÚNG CÚ PHÁP ĐÁNH DẤU SAU (KHÔ
 (Viết 1 đoạn thoại ngắn khoảng 15-28 từ để bé KOL tự nói, giọng điệu hài hước, lầy lội, tự nhiên đời thường, thích hợp cho clip 5s - 10s)
 
 [LOOKBOOK PROMPT TIẾNG ANH]
-(1 đoạn prompt tiếng Anh chi tiết chuẩn 8k photorealistic miêu tả bé {profile['name']} với nét mặt hài hước dở khóc dở cười tại bối cảnh tình huống trên, có đề cập đặc điểm gương mặt DNA của bé, không chứa chữ)
+(1 đoạn prompt tiếng Anh chi tiết chuẩn 8k photorealistic miêu tả bé {profile['name']} với nét mặt hài hước dở khóc dở cười tại bối cảnh tình huống trên, có giữ chuẩn vóc dáng {h} {w} {b_type} và đặc điểm gương mặt DNA của bé, không chứa chữ)
 
 [MOTION PROMPT TIẾNG ANH]
 (1 câu prompt tiếng Anh mô tả cử động khuôn mặt, nói chuyện tự nhiên vào micro/camera, chớp mắt, biểu cảm sống động)
@@ -881,7 +1048,7 @@ Cùng {profile['name']} tác nghiệp thực tế: {req.user_idea[:40]}
 Trời ơi cả nhà ơi! Hôm nay em đi thực tế mà cười ra nước mắt luôn á, ai cũng nhìn em quá trời!
 
 [LOOKBOOK PROMPT TIẾNG ANH]
-{profile.get('dna_prompt', '')}, expressive humorous funny facial expression, {req.user_idea}, 8k photorealistic, raw color film aesthetic, ultra-sharp 8k, flawless natural skin, beautiful cinematic lighting, clean without text
+{profile.get('dna_prompt', '')}, height {h}, weight {w}, {b_type}, expressive humorous funny facial expression, {req.user_idea}, 8k photorealistic, raw color film aesthetic, ultra-sharp 8k, flawless natural skin, beautiful cinematic lighting, clean without text
 
 [MOTION PROMPT TIẾNG ANH]
 The girl speaks naturally into the camera, smiling humorously, lively natural blinking and cute facial expressions, 4k ultra-smooth lifelike video
@@ -928,21 +1095,26 @@ Hôm nay đi thực tế mà hài hước không đỡ nổi luôn cả nhà ơi
         img_url = None
         img_local = None
 
-        # Resolve base visual anchor if available
-        if req.use_face_anchor and profile.get("face_anchor_url"):
-            anchor_fn = os.path.basename(profile["face_anchor_url"])
+        # Resolve base visual anchor if available (prefer front/face anchor)
+        anchors_map = profile.get("multi_angle_anchors") or {}
+        preferred_anchor_url = anchors_map.get("front") or profile.get("face_anchor_url")
+        if req.use_face_anchor and preferred_anchor_url:
+            anchor_fn = os.path.basename(preferred_anchor_url)
             cand = os.path.join(ANCHORS_DIR, anchor_fn)
             if os.path.exists(cand):
                 img_fn = anchor_fn
-                img_url = profile["face_anchor_url"]
+                img_url = preferred_anchor_url
                 img_local = cand
 
         # Try generating fresh lookbook image; if Meta image API is temporarily down, use visual anchor
         try:
             dna = profile.get("dna_prompt", "").strip()
+            bio_anchor = f"height {h}, weight {w}, {b_type} silhouette"
             combined_prompt = lookbook_prompt
+            if bio_anchor.lower() not in lookbook_prompt.lower():
+                combined_prompt = f"{combined_prompt}, {bio_anchor}"
             if dna and dna.lower() not in lookbook_prompt.lower():
-                combined_prompt = f"{dna}, {lookbook_prompt}"
+                combined_prompt = f"{dna}, {combined_prompt}"
 
             img_req = ImageRequest(
                 prompt=combined_prompt,
@@ -964,12 +1136,12 @@ Hôm nay đi thực tế mà hài hước không đỡ nổi luôn cả nhà ơi
                 shutil.copy2(img_local, os.path.join(p_gallery, img_fn))
         except Exception as img_err:
             log.warning("[KOL] Fresh lookbook image generation bypassed (%s). Using character visual anchor: %s", img_err, img_local)
-            if not img_local and profile.get("face_anchor_url"):
-                anchor_fn = os.path.basename(profile["face_anchor_url"])
+            if not img_local and preferred_anchor_url:
+                anchor_fn = os.path.basename(preferred_anchor_url)
                 cand = os.path.join(ANCHORS_DIR, anchor_fn)
                 if os.path.exists(cand):
                     img_fn = anchor_fn
-                    img_url = profile["face_anchor_url"]
+                    img_url = preferred_anchor_url
                     img_local = cand
 
         # Phase 3: Motion Video Generation
@@ -982,7 +1154,7 @@ Hôm nay đi thực tế mà hài hước không đỡ nổi luôn cả nhà ơi
 
         duration = req.duration or 5
         ratio = req.aspect_ratio or "9:16"
-        video_instruction = f"{profile['name']}, {motion_prompt}"
+        video_instruction = f"{profile['name']} (height {h}, weight {w}, {b_type}), {motion_prompt}"
 
         vid_req = VideoRequest(
             prompt=video_instruction,
