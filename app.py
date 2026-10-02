@@ -1768,6 +1768,16 @@ def get_kol_media(folder: str, name: str):
     return FileResponse(p)
 
 
+@app.get("/kol/media/gallery/{profile_id}/{name}")
+def get_kol_gallery_media(profile_id: str, name: str):
+    if "/" in name or "\\" in name or ".." in name or "/" in profile_id or "\\" in profile_id or ".." in profile_id:
+        raise HTTPException(400, "Tên file không hợp lệ")
+    p = os.path.join(BASE_DIR, "data", "kol", "gallery", profile_id, name)
+    if not os.path.isfile(p):
+        raise HTTPException(404, "File không tồn tại")
+    return FileResponse(p)
+
+
 
 # ------------------------- 账号自动保活与静默续期 -------------------------
 KEEPALIVE_LOCK = asyncio.Lock()

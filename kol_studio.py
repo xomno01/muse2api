@@ -858,9 +858,18 @@ def get_gallery(profile_id: str):
     for fn in os.listdir(p_gallery):
         if fn.lower().endswith(('.png', '.jpg', '.webp', '.mp4')):
             full = os.path.join(p_gallery, fn)
+            if os.path.exists(os.path.join(VIDEOS_DIR, fn)):
+                item_url = f"/kol/media/videos/{fn}"
+            elif os.path.exists(os.path.join(ANCHORS_DIR, fn)):
+                item_url = f"/kol/media/anchors/{fn}"
+            elif os.path.exists(os.path.join(BASE_DIR, "data", "media", fn)):
+                item_url = f"/v1/media/{fn}"
+            else:
+                item_url = f"/kol/media/gallery/{profile_id}/{fn}"
+
             items.append({
                 "filename": fn,
-                "url": f"/v1/media/{fn}",
+                "url": item_url,
                 "kind": "video" if fn.lower().endswith(".mp4") else "image",
                 "mtime": int(os.path.getmtime(full)),
                 "size": os.path.getsize(full),
