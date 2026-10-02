@@ -591,6 +591,51 @@
       font-size: 10px;
       font-weight: 600;
     }
+
+    /* Stepper for Auto Production */
+    .step-dot {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 8px 6px;
+      text-align: center;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.3s ease;
+    }
+    .step-dot.active {
+      border-color: var(--primary);
+      background: rgba(236, 72, 153, 0.12);
+      color: #fff;
+    }
+    .step-dot.done {
+      border-color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-emerald);
+    }
+    .step-num {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .step-dot.active .step-num {
+      background: var(--primary);
+      color: #fff;
+    }
+    .step-dot.done .step-num {
+      background: var(--accent-emerald);
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -626,8 +671,9 @@
 
   <!-- Tabs Navigation -->
   <nav class="tabs-bar">
-    <button class="tab-btn active" onclick="showTab('tab-char')">🎭 Nhân Vật & DNA</button>
-    <button class="tab-btn" onclick="showTab('tab-script')">🎬 Kịch Bản Phim & Phỏng Vấn</button>
+    <button class="tab-btn active" onclick="showTab('tab-autoprod')">🚀 Sản Xuất Clip 1-Click</button>
+    <button class="tab-btn" onclick="showTab('tab-char')">🎭 Nhân Vật & DNA</button>
+    <button class="tab-btn" onclick="showTab('tab-script')">🎬 Kịch Bản & Phân Cảnh</button>
     <button class="tab-btn" onclick="showTab('tab-lookbook')">📸 Xưởng Chụp Lookbook</button>
     <button class="tab-btn" onclick="showTab('tab-motion')">🎬 Dựng Video Chuyển Động</button>
     <button class="tab-btn" onclick="showTab('tab-voice')">🎙️ Phòng Thu & Ghép Voice</button>
@@ -638,8 +684,149 @@
   <!-- Main Container -->
   <main>
 
+    <!-- ==================== TAB 0: SẢN XUẤT CLIP 1-CLICK ==================== -->
+    <section id="tab-autoprod" class="tab-content active">
+      <div class="bento-grid">
+        <!-- Left: Prompt & Production Setup -->
+        <div class="col-5">
+          <div class="card" style="border-color: rgba(236, 72, 153, 0.35); box-shadow: 0 0 25px rgba(236,72,153,0.08);">
+            <div class="card-header">
+              <div>
+                <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 20px;">🚀</span>
+                  <span style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Xưởng Sản Xuất Clip 1-Click</span>
+                </div>
+                <div class="card-sub">Nhập 1 câu ý tưởng tình huống — AI sẽ tự động: Lên kịch bản ➔ Chụp ảnh hiện trường ➔ Dựng video cử động ➔ Thu âm giọng đọc ➔ Ghép phụ đề & âm thanh thành video hoàn chỉnh!</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tình Huống Video Của Bé KOL (Prompt):</label>
+              <textarea id="autoProdIdea" class="textarea" style="height: 110px; font-size: 13.5px;" placeholder="Ví dụ: kol vẻ mặt hài hước đi phỏng vấn người dân giữa đường ngập nước sau đêm mưa rất lớn tối nay...">kol vẻ mặt hài hước đi phỏng vấn người dân giữa đường ngập nước sau đêm mưa rất lớn tối nay</textarea>
+              
+              <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px;">
+                <span class="preset-chip" style="font-size: 11px; padding: 4px 8px; cursor: pointer;" onclick="document.getElementById('autoProdIdea').value = 'kol vẻ mặt hài hước đi phỏng vấn người dân giữa đường ngập nước sau đêm mưa rất lớn tối nay'">🌊 Phỏng vấn đường ngập</span>
+                <span class="preset-chip" style="font-size: 11px; padding: 4px 8px; cursor: pointer;" onclick="document.getElementById('autoProdIdea').value = 'bác sĩ khám bệnh hài hước cho bệnh nhân tự suy nghĩ đi và cái kết cười ra nước mắt'">🏥 Bác sĩ và bệnh nhân (Reel)</span>
+                <span class="preset-chip" style="font-size: 11px; padding: 4px 8px; cursor: pointer;" onclick="document.getElementById('autoProdIdea').value = 'kol cầm mic đồ chơi đi xin quá giang xe máy người đi đường giữa giờ tan tầm kẹt xe'">🛵 Xin quá giang xe máy</span>
+                <span class="preset-chip" style="font-size: 11px; padding: 4px 8px; cursor: pointer;" onclick="document.getElementById('autoProdIdea').value = 'kol phục vụ quán phở ngày đầu lóng ngóng làm rơi đũa nhưng đối đáp khách siêu duyên'">🍜 Lóng ngóng phụ quán phở</span>
+              </div>
+            </div>
+
+            <div class="bento-grid" style="gap: 10px; margin-bottom: 14px;">
+              <div class="col-6">
+                <label class="form-label">Khổ Video:</label>
+                <select id="autoProdAspect" class="select">
+                  <option value="9:16" selected>9:16 (Dọc TikTok / Reels / Shorts)</option>
+                  <option value="16:9">16:9 (Ngang YouTube)</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label class="form-label">Thời lượng cử động:</label>
+                <select id="autoProdDuration" class="select">
+                  <option value="5" selected>5 Giây (Chuẩn Reel mượt)</option>
+                  <option value="8">8 Giây</option>
+                  <option value="10">10 Giây</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; background: var(--surface); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--line);">
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer;">
+                <input type="checkbox" id="autoProdFaceAnchor" checked style="accent-color: var(--primary);" />
+                <span>🎯 <b>Khóa Face Anchor:</b> Giữ nguyên 100% gương mặt bé KOL</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer;">
+                <input type="checkbox" id="autoProdSubtitles" checked style="accent-color: var(--primary);" />
+                <span>💬 <b>Chèn Phụ Đề Nổi Bật:</b> Tự động tạo chữ chạy trên video kiểu Reel</span>
+              </label>
+            </div>
+
+            <button id="btnStartAutoProd" class="btn btn-primary btn-block" style="font-size: 15px; font-weight: 700; padding: 14px; text-transform: uppercase; letter-spacing: 0.5px;" onclick="startAutoProduction()">
+              🚀 1-Click Bắt Đầu Sản Xuất Clip
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Real-time Pipeline Progress & Final Reel Player -->
+        <div class="col-7">
+          <div class="card" style="min-height: 520px; display: flex; flex-direction: column;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">📺 Màn Chiếu Video Thành Phẩm (Full Audio Reel)</div>
+                <div class="card-sub">Video MP4 hoàn chỉnh có hình ảnh, chuyển động, lồng tiếng và phụ đề sẽ phát tại đây.</div>
+              </div>
+              <div id="autoProdActionBtns" style="display: none; gap: 8px;">
+                <a id="btnDownloadAutoProd" href="" download class="btn btn-primary btn-sm">⬇️ Tải Video MP4</a>
+                <button class="btn btn-secondary btn-sm" onclick="copyAutoProdCaption()">📋 Lấy Caption</button>
+              </div>
+            </div>
+
+            <!-- Placeholder State -->
+            <div id="autoProdPlaceholder" class="media-box" style="flex: 1; min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+              <div style="font-size: 48px; margin-bottom: 12px; opacity: 0.8;">🎬</div>
+              <div style="font-weight: 600; color: #fff; margin-bottom: 6px;">Chưa có video nào đang sản xuất</div>
+              <div style="font-size: 12px; color: var(--text-muted); max-width: 380px; text-align: center;">Nhập tình huống ở cột bên trái và bấm <b>"1-Click Bắt Đầu Sản Xuất Clip"</b> để AI tự động dựng clip từ A-Z!</div>
+            </div>
+
+            <!-- Live Progress State -->
+            <div id="autoProdProgressWrap" style="display: none; padding: 24px; flex: 1; flex-direction: column; justify-content: center; gap: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span id="autoProdStepBadge" style="font-size: 12px; font-weight: 700; color: var(--accent-pink); background: rgba(236,72,153,0.15); padding: 4px 10px; border-radius: 999px;">BƯỚC 1/5</span>
+                <span id="autoProdPercentText" style="font-size: 14px; font-weight: 700; color: #fff;">15%</span>
+              </div>
+
+              <div class="progress-bar-wrap" style="width: 100%; height: 10px;">
+                <div id="autoProdProgressBar" class="progress-bar-fill" style="width: 15%; transition: width 0.4s ease;"></div>
+              </div>
+
+              <div id="autoProdStatusText" style="font-size: 14px; font-weight: 600; color: #fff; text-align: center;">
+                Đang khởi tạo xưởng sản xuất video...
+              </div>
+
+              <!-- 5-Step Visual Stepper -->
+              <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px;">
+                <div id="stepDot1" class="step-dot active"><span class="step-num">1</span> Kịch bản & Thoại</div>
+                <div id="stepDot2" class="step-dot"><span class="step-num">2</span> Chụp ảnh 8K</div>
+                <div id="stepDot3" class="step-dot"><span class="step-num">3</span> Dựng Video</div>
+                <div id="stepDot4" class="step-dot"><span class="step-num">4</span> Thu âm AI</div>
+                <div id="stepDot5" class="step-dot"><span class="step-num">5</span> Ghép Sub & Âm</div>
+              </div>
+
+              <!-- Live Preview Thumbs when available -->
+              <div id="autoProdLivePreview" style="display: flex; gap: 12px; justify-content: center; margin-top: 10px;">
+                <img id="autoLiveImg" src="" style="width: 70px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid var(--primary); display: none;" />
+                <video id="autoLiveVid" src="" muted loop autoplay playsinline style="width: 70px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid var(--accent-cyan); display: none;"></video>
+              </div>
+            </div>
+
+            <!-- Completed Video Player State -->
+            <div id="autoProdResultBox" style="display: none; flex: 1; flex-direction: column;">
+              <div class="media-box" style="height: 400px; background: #000; position: relative;">
+                <video id="autoProdFinalVideo" controls autoplay playsinline style="width: 100%; height: 100%; object-fit: contain;"></video>
+              </div>
+
+              <!-- Production details accordion -->
+              <div style="margin-top: 14px; background: var(--surface); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--line); font-size: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <b id="autoProdResTitle" style="color: #fff; font-size: 13px;">Tiêu đề clip</b>
+                  <span id="autoProdResDuration" style="color: var(--accent-emerald);">5.0s</span>
+                </div>
+                <div style="margin-bottom: 6px; color: var(--text);">
+                  <b>🎙️ Lời thoại đã lồng:</b> <span id="autoProdResSpoken" style="color: var(--accent-cyan);"></span>
+                </div>
+                <div style="color: var(--text-muted); font-size: 11px;">
+                  <b>📱 Caption:</b> <span id="autoProdResCaption"></span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ==================== TAB 1: NHÂN VẬT & DNA ==================== -->
-    <section id="tab-char" class="tab-content active">
+    <section id="tab-char" class="tab-content">
       <div class="bento-grid">
         <div class="col-12">
           <div class="card">
@@ -1923,6 +2110,152 @@
       document.getElementById('voiceText').value = clean;
       showTab('tab-voice');
       toast('Đã chuyển lời thoại sang Phòng Thu!', 'ok');
+    }
+
+    // ================= 1-Click Auto Production Engine =================
+    let autoProdPollInterval = null;
+    let currentAutoProdResult = null;
+
+    async function startAutoProduction() {
+      if (!ACTIVE_KOL) return toast('Vui lòng chọn bé KOL', 'err');
+      const idea = document.getElementById('autoProdIdea').value.trim();
+      if (!idea) return toast('Vui lòng nhập tình huống video', 'err');
+
+      const btn = document.getElementById('btnStartAutoProd');
+      const ph = document.getElementById('autoProdPlaceholder');
+      const prog = document.getElementById('autoProdProgressWrap');
+      const resBox = document.getElementById('autoProdResultBox');
+      const actBtns = document.getElementById('autoProdActionBtns');
+
+      btn.disabled = true;
+      ph.style.display = 'none';
+      resBox.style.display = 'none';
+      actBtns.style.display = 'none';
+      prog.style.display = 'flex';
+
+      document.getElementById('autoLiveImg').style.display = 'none';
+      document.getElementById('autoLiveVid').style.display = 'none';
+
+      updateAutoProdStepper(1, 10, 'Đang khởi tạo xưởng sản xuất video trọn gói...');
+
+      const payload = {
+        profile_id: ACTIVE_KOL.id,
+        user_idea: idea,
+        duration: parseInt(document.getElementById('autoProdDuration').value) || 5,
+        aspect_ratio: document.getElementById('autoProdAspect').value || '9:16',
+        use_face_anchor: document.getElementById('autoProdFaceAnchor').checked,
+        add_subtitles: document.getElementById('autoProdSubtitles').checked,
+      };
+
+      try {
+        const res = await fetch('/kol/api/auto-produce', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        }).then(r => r.json());
+
+        if (res.task_id) {
+          pollAutoProduction(res.task_id);
+        } else {
+          throw new Error(res.detail || 'Không khởi tạo được tác vụ sản xuất');
+        }
+      } catch (e) {
+        toast('Lỗi sản xuất video: ' + e.message, 'err');
+        prog.style.display = 'none';
+        btn.disabled = false;
+        ph.style.display = 'flex';
+      }
+    }
+
+    function updateAutoProdStepper(phaseNum, percent, statusText) {
+      document.getElementById('autoProdStepBadge').textContent = `BƯỚC ${phaseNum}/5`;
+      document.getElementById('autoProdPercentText').textContent = `${percent}%`;
+      document.getElementById('autoProdProgressBar').style.width = `${percent}%`;
+      document.getElementById('autoProdStatusText').textContent = statusText;
+
+      for (let i = 1; i <= 5; i++) {
+        const dot = document.getElementById('stepDot' + i);
+        if (dot) {
+          if (i < phaseNum) {
+            dot.className = 'step-dot done';
+          } else if (i === phaseNum) {
+            dot.className = 'step-dot active';
+          } else {
+            dot.className = 'step-dot';
+          }
+        }
+      }
+    }
+
+    function pollAutoProduction(taskId) {
+      clearInterval(autoProdPollInterval);
+      const btn = document.getElementById('btnStartAutoProd');
+      const prog = document.getElementById('autoProdProgressWrap');
+      const resBox = document.getElementById('autoProdResultBox');
+      const actBtns = document.getElementById('autoProdActionBtns');
+      const vid = document.getElementById('autoProdFinalVideo');
+
+      autoProdPollInterval = setInterval(async () => {
+        try {
+          const res = await fetch('/kol/api/auto-tasks/' + taskId).then(r => r.json());
+          if (!res) return;
+
+          const p = res.progress || 10;
+          let phaseNum = 1;
+          if (res.phase) {
+            const m = res.phase.match(/(\d+)/);
+            if (m) phaseNum = parseInt(m[1]);
+          }
+          updateAutoProdStepper(phaseNum, p, res.step || 'Đang xử lý...');
+
+          // Live preview thumbs
+          if (res.preview_image) {
+            const imgEl = document.getElementById('autoLiveImg');
+            imgEl.src = res.preview_image;
+            imgEl.style.display = 'block';
+          }
+          if (res.preview_video) {
+            const vidEl = document.getElementById('autoLiveVid');
+            vidEl.src = res.preview_video;
+            vidEl.style.display = 'block';
+          }
+
+          if (res.status === 'completed' && res.result) {
+            clearInterval(autoProdPollInterval);
+            currentAutoProdResult = res.result;
+
+            vid.src = res.result.final_video_url;
+            document.getElementById('btnDownloadAutoProd').href = res.result.final_video_url;
+            document.getElementById('autoProdResTitle').textContent = res.result.title || 'Clip hoàn chỉnh';
+            document.getElementById('autoProdResDuration').textContent = `${res.result.audio_duration || 5}s`;
+            document.getElementById('autoProdResSpoken').textContent = `"${res.result.voice_text || ''}"`;
+            document.getElementById('autoProdResCaption').textContent = res.result.caption || '';
+
+            prog.style.display = 'none';
+            resBox.style.display = 'flex';
+            actBtns.style.display = 'flex';
+            btn.disabled = false;
+            vid.play();
+
+            toast('🎉 Sản xuất clip hoàn chỉnh có tiếng thành công!', 'ok');
+            loadGallery();
+          } else if (res.status === 'failed') {
+            clearInterval(autoProdPollInterval);
+            prog.style.display = 'none';
+            btn.disabled = false;
+            document.getElementById('autoProdPlaceholder').style.display = 'flex';
+            toast('Sản xuất thất bại: ' + (res.error || 'Timeout'), 'err');
+          }
+        } catch (err) {
+          console.error('Auto poll error:', err);
+        }
+      }, 3000);
+    }
+
+    function copyAutoProdCaption() {
+      if (!currentAutoProdResult || !currentAutoProdResult.caption) return;
+      navigator.clipboard.writeText(currentAutoProdResult.caption);
+      toast('Đã sao chép caption mạng xã hội!', 'ok');
     }
 
     // ================= Gallery Vault =================

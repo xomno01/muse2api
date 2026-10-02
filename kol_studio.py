@@ -10,8 +10,10 @@ import asyncio
 import json
 import logging
 import os
+import re
 import shutil
 import subprocess
+import threading
 import time
 import uuid
 from typing import Any, Dict, List, Optional
@@ -138,6 +140,16 @@ class ScriptReq(BaseModel):
     user_idea: str
     format_id: Optional[str] = "street_interview"
     extra_tone: Optional[str] = ""
+
+
+class AutoProduceReq(BaseModel):
+    profile_id: str
+    user_idea: str
+    duration: Optional[int] = 5
+    aspect_ratio: Optional[str] = "9:16"
+    voice_id: Optional[str] = None
+    add_subtitles: Optional[bool] = True
+    use_face_anchor: Optional[bool] = True
 
 
 # ===================== Endpoints =====================
@@ -696,3 +708,406 @@ def get_gallery(profile_id: str):
             })
     items.sort(key=lambda x: x["mtime"], reverse=True)
     return items
+
+
+# ===================== Auto Video Production Engine =====================
+AUTO_TASKS: dict[str, dict] = {}
+
+
+def _get_media_duration(file_path: str) -> float:
+    cmd = [FFMPEG_BIN, "-i", file_path]
+    try:
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        m = re.search(r"Duration:\s*(\d+):(\d+):(\d+\.\d+)", p.stderr)
+        if m:
+            hours, mins, secs = float(m.group(1)), float(m.group(2)), float(m.group(3))
+            return hours * 3600 + mins * 60 + secs
+    except Exception as e:
+        log.warning("Failed to get duration of %s: %s", file_path, e)
+    return 5.0
+
+
+def _generate_srt_file(text: str, total_duration: float, srt_dest_path: str):
+    clean_text = text.replace("\n", " ").strip()
+    raw_parts = [p.strip() for p in re.split(r"([.!?…,:;]+)", clean_text) if p.strip()]
+    lines = []
+    i = 0
+    while i < len(raw_parts):
+        chunk = raw_parts[i]
+        if i + 1 < len(raw_parts) and re.match(r"^[.!?…,:;]+$", raw_parts[i+1]):
+            chunk += raw_parts[i+1]
+            i += 2
+        else:
+            i += 1
+        if len(chunk) > 2:
+            lines.append(chunk)
+
+    if not lines:
+        lines = [clean_text]
+
+    merged = []
+    buf = ""
+    for l in lines:
+        buf = (buf + " " + l).strip()
+        if len(buf.split()) >= 6:
+            merged.append(buf)
+            buf = ""
+    if buf:
+        merged.append(buf)
+    lines = merged or lines
+
+    count = len(lines)
+    time_per_line = max(1.0, total_duration / count)
+
+    def format_ts(sec: float) -> str:
+        hours = int(sec // 3600)
+        mins = int((sec % 3600) // 60)
+        secs = int(sec % 60)
+        millis = int((sec - int(sec)) * 1000)
+        return f"{hours:02d}:{mins:02d}:{secs:02d},{millis:03d}"
+
+    srt_entries = []
+    for idx, line in enumerate(lines):
+        start_sec = idx * time_per_line
+        end_sec = min(total_duration, (idx + 1) * time_per_line)
+        srt_entries.append(f"{idx + 1}\n{format_ts(start_sec)} --> {format_ts(end_sec)}\n{line}\n")
+
+    with open(srt_dest_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(srt_entries))
+
+
+def _mux_with_subtitles(v_path: str, a_path: str, srt_path: Optional[str], out_path: str):
+    vf_filter = None
+    if srt_path and os.path.exists(srt_path):
+        srt_esc = os.path.abspath(srt_path).replace("\\", "/")
+        if ":" in srt_esc:
+            d, r = srt_esc.split(":", 1)
+            srt_esc = f"{d}\\:{r}"
+        vf_filter = f"subtitles='{srt_esc}':force_style='FontSize=22,Fontname=Arial,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BorderStyle=3,Outline=2,Alignment=2,MarginV=50'"
+
+    cmd = [
+        FFMPEG_BIN, "-y",
+        "-stream_loop", "-1",
+        "-i", v_path,
+        "-i", a_path,
+        "-map", "0:v:0",
+        "-map", "1:a:0",
+    ]
+    if vf_filter:
+        cmd.extend(["-vf", vf_filter])
+    cmd.extend([
+        "-c:v", "libx264",
+        "-preset", "veryfast",
+        "-c:a", "aac",
+        "-shortest",
+        out_path
+    ])
+
+    try:
+        subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True, text=True)
+    except Exception as exc:
+        log.warning("[KOL] FFmpeg mux with sub failed, retrying without sub: %s", exc)
+        cmd_fallback = [
+            FFMPEG_BIN, "-y",
+            "-stream_loop", "-1",
+            "-i", v_path,
+            "-i", a_path,
+            "-map", "0:v:0",
+            "-map", "1:a:0",
+            "-c:v", "libx264",
+            "-preset", "veryfast",
+            "-c:a", "aac",
+            "-shortest",
+            out_path
+        ]
+        subprocess.run(cmd_fallback, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+
+
+def _run_auto_produce_worker(task_id: str, req: AutoProduceReq):
+    import threading
+    from app import CFG, _run_generation, media_url, safe_chat_stream, store
+
+    profiles = _load_profiles()
+    profile = next((p for p in profiles if p["id"] == req.profile_id), None)
+    if not profile:
+        AUTO_TASKS[task_id] = {"status": "failed", "error": "Không tìm thấy hồ sơ KOL", "progress": 0}
+        return
+
+    try:
+        # Phase 1: Script, Hook, Prompts
+        AUTO_TASKS[task_id].update({
+            "status": "processing",
+            "progress": 15,
+            "phase": "1/5",
+            "step": "Muse Spark đang sáng tạo kịch bản, câu thoại & prompt bối cảnh...",
+        })
+
+        acc = store.pick_account(rotate=True)
+        if not acc:
+            raise RuntimeError("Chưa có tài khoản Muse nào khả dụng")
+
+        prompt = f"""Bạn là Giám đốc Sáng tạo chuyên sản xuất Short Video / Reel TikTok triệu view cho KOL Ảo.
+Nhân vật: {profile['name']} ({profile.get('age', 21)} tuổi, {profile.get('archetype', 'Nàng thơ')}).
+Tính cách: {profile.get('personality_tone', 'Hài hước, duyên dáng')}
+DNA ngoại hình: {profile.get('dna_prompt', '')[:220]}
+
+Tình huống người dùng yêu cầu: "{req.user_idea}"
+
+HÃY XUẤT RA CHÍNH XÁC 5 PHẦN THEO ĐÚNG CÚ PHÁP ĐÁNH DẤU SAU (KHÔNG THÊM BỚT):
+
+[TIÊU ĐỀ]
+(Tiêu đề ngắn cực cuốn giật tít)
+
+[CÂU THOẠI LỒNG TIẾNG]
+(Viết 1 đoạn thoại ngắn khoảng 15-28 từ để bé KOL tự nói, giọng điệu hài hước, lầy lội, tự nhiên đời thường, thích hợp cho clip 5s - 10s)
+
+[LOOKBOOK PROMPT TIẾNG ANH]
+(1 đoạn prompt tiếng Anh chi tiết chuẩn 8k photorealistic miêu tả bé {profile['name']} với nét mặt hài hước dở khóc dở cười tại bối cảnh tình huống trên, có đề cập đặc điểm gương mặt DNA của bé, không chứa chữ)
+
+[MOTION PROMPT TIẾNG ANH]
+(1 câu prompt tiếng Anh mô tả cử động khuôn mặt, nói chuyện tự nhiên vào micro/camera, chớp mắt, biểu cảm sống động)
+
+[CAPTION MẠNG XÃ HỘI]
+(Status ngắn hài hước kèm 5 hashtag trending)"""
+
+        try:
+            resp = "".join(safe_chat_stream(acc['cookies'], prompt, acc.get('cookies_exp'), 120, account_id=acc['id']))
+        except Exception as chat_err:
+            log.warning("[KOL] Muse chat stream timeout or error: %s. Using high-engaging fallback generator.", chat_err)
+            resp = f"""[TIÊU ĐỀ]
+Cùng {profile['name']} tác nghiệp thực tế: {req.user_idea[:40]}
+
+[CÂU THOẠI LỒNG TIẾNG]
+Trời ơi cả nhà ơi! Hôm nay em đi thực tế mà cười ra nước mắt luôn á, ai cũng nhìn em quá trời!
+
+[LOOKBOOK PROMPT TIẾNG ANH]
+{profile.get('dna_prompt', '')}, expressive humorous funny facial expression, {req.user_idea}, 8k photorealistic, raw color film aesthetic, ultra-sharp 8k, flawless natural skin, beautiful cinematic lighting, clean without text
+
+[MOTION PROMPT TIẾNG ANH]
+The girl speaks naturally into the camera, smiling humorously, lively natural blinking and cute facial expressions, 4k ultra-smooth lifelike video
+
+[CAPTION MẠNG XÃ HỘI]
+Hôm nay đi thực tế mà hài hước không đỡ nổi luôn cả nhà ơi 🤣 #{profile['name']} #xuhuong #haihuoc #viral"""
+
+        title_m = re.search(r"\[TIÊU ĐỀ\]\s*\n+([^\n\[]+)", resp)
+        title = title_m.group(1).strip() if title_m else f"Clip {profile['name']}: {req.user_idea[:30]}"
+
+        voice_m = re.search(r"\[CÂU THOẠI LỒNG TIẾNG\]\s*\n+([^\n\[]+(?:\n+[^\n\[]+)*)", resp)
+        voice_text = voice_m.group(1).strip() if voice_m else f"Chào cả nhà, hôm nay cùng {profile['name']} trải nghiệm nhé!"
+        voice_text = voice_text.replace('"', '').replace('“', '').replace('”', '').strip()
+
+        lb_m = re.search(r"\[LOOKBOOK PROMPT TIẾNG ANH\]\s*\n+([\s\S]*?)(?=\n*\[|\n*MOTION PROMPT|\Z)", resp, re.IGNORECASE)
+        lookbook_prompt = lb_m.group(1).strip("` \n\r") if lb_m else f"{profile.get('dna_prompt', '')}, in funny situation, {req.user_idea}, 8k photorealistic"
+        lookbook_prompt = re.sub(r"^`+|`+$", "", lookbook_prompt).strip()
+
+        motion_m = re.search(r"\[MOTION PROMPT TIẾNG ANH\]\s*\n+([\s\S]*?)(?=\n*\[|\n*CAPTION|\Z)", resp, re.IGNORECASE)
+        motion_prompt = motion_m.group(1).strip("` \n\r") if motion_m else "The girl speaks naturally into the camera, smiling humorously, natural blinking and head movement"
+        motion_prompt = re.sub(r"^`+|`+$", "", motion_prompt).strip()
+
+        cap_m = re.search(r"\[CAPTION MẠNG XÃ HỘI\]\s*\n+([\s\S]*?)(?=\Z)", resp, re.IGNORECASE)
+        caption = cap_m.group(1).strip("` \n\r") if cap_m else f"{title} #{profile['name']} #xuhuong"
+
+        # Phase 2: Lookbook Image / Visual Anchor
+        AUTO_TASKS[task_id].update({
+            "progress": 35,
+            "phase": "2/5",
+            "step": f"Đã có kịch bản! Đang chuẩn bị hình ảnh hiện trường cho {profile['name']}...",
+            "title": title,
+            "voice_text": voice_text,
+            "lookbook_prompt": lookbook_prompt,
+            "motion_prompt": motion_prompt,
+            "caption": caption,
+        })
+
+        from app import ImageRequest, build_image_prompt, VideoRequest, build_video_prompt
+
+        p_gallery = os.path.join(GALLERY_DIR, req.profile_id)
+        os.makedirs(p_gallery, exist_ok=True)
+
+        img_fn = None
+        img_url = None
+        img_local = None
+
+        # Resolve base visual anchor if available
+        if req.use_face_anchor and profile.get("face_anchor_url"):
+            anchor_fn = os.path.basename(profile["face_anchor_url"])
+            cand = os.path.join(ANCHORS_DIR, anchor_fn)
+            if os.path.exists(cand):
+                img_fn = anchor_fn
+                img_url = profile["face_anchor_url"]
+                img_local = cand
+
+        # Try generating fresh lookbook image; if Meta image API is temporarily down, use visual anchor
+        try:
+            dna = profile.get("dna_prompt", "").strip()
+            combined_prompt = lookbook_prompt
+            if dna and dna.lower() not in lookbook_prompt.lower():
+                combined_prompt = f"{dna}, {lookbook_prompt}"
+
+            img_req = ImageRequest(
+                prompt=combined_prompt,
+                aspect_ratio=req.aspect_ratio or "9:16",
+                reference_image=None,
+            )
+            final_img_prompt = build_image_prompt(img_req)
+
+            img_res, img_acc = _run_generation(
+                final_img_prompt,
+                kind="image",
+                timeout=min(CFG.image_timeout, 90),
+                reference_image=None,
+            )
+            img_fn = img_res["filename"]
+            img_url = media_url(img_fn)
+            img_local = os.path.join(BASE_DIR, "data", "media", img_fn)
+            if os.path.exists(img_local):
+                shutil.copy2(img_local, os.path.join(p_gallery, img_fn))
+        except Exception as img_err:
+            log.warning("[KOL] Fresh lookbook image generation bypassed (%s). Using character visual anchor: %s", img_err, img_local)
+            if not img_local and profile.get("face_anchor_url"):
+                anchor_fn = os.path.basename(profile["face_anchor_url"])
+                cand = os.path.join(ANCHORS_DIR, anchor_fn)
+                if os.path.exists(cand):
+                    img_fn = anchor_fn
+                    img_url = profile["face_anchor_url"]
+                    img_local = cand
+
+        # Phase 3: Motion Video Generation
+        AUTO_TASKS[task_id].update({
+            "progress": 55,
+            "phase": "3/5",
+            "step": f"Đã có ảnh nhân vật! Đang dựng video chuyển động {req.aspect_ratio or '9:16'}...",
+            "preview_image": img_url,
+        })
+
+        duration = req.duration or 5
+        ratio = req.aspect_ratio or "9:16"
+        video_instruction = f"{profile['name']}, {motion_prompt}"
+
+        vid_req = VideoRequest(
+            prompt=video_instruction,
+            aspect_ratio=ratio,
+            duration=duration,
+            reference_image=img_local,
+        )
+        final_video_prompt = build_video_prompt(vid_req)
+
+        vid_res, vid_acc = _run_generation(
+            final_video_prompt,
+            kind="video",
+            timeout=CFG.video_timeout,
+            reference_image=img_local,
+        )
+        raw_vid_fn = vid_res["filename"]
+        raw_vid_url = media_url(raw_vid_fn)
+        raw_vid_local = os.path.join(BASE_DIR, "data", "media", raw_vid_fn)
+
+        if os.path.exists(raw_vid_local):
+            shutil.copy2(raw_vid_local, os.path.join(p_gallery, raw_vid_fn))
+
+        # Phase 4: Voice Synthesis (Edge-TTS)
+        AUTO_TASKS[task_id].update({
+            "progress": 80,
+            "phase": "4/5",
+            "step": "Đã dựng xong video! Đang thu âm giọng đọc AI tiếng Việt...",
+            "preview_video": raw_vid_url,
+        })
+
+        voice_id = req.voice_id or profile.get("voice", "vi-VN-HoaiMyNeural")
+        audio_fn = f"autoprod_{task_id}.mp3"
+        audio_path = os.path.join(AUDIO_DIR, audio_fn)
+
+        comm = edge_tts.Communicate(voice_text, voice_id, rate="+0%", pitch="+0Hz")
+        asyncio.run(comm.save(audio_path))
+        audio_url = f"/kol/media/audio/{audio_fn}"
+        audio_dur = _get_media_duration(audio_path)
+
+        # Phase 5: FFmpeg Mux + Subtitles
+        AUTO_TASKS[task_id].update({
+            "progress": 90,
+            "phase": "5/5",
+            "step": "Đang ghép âm thanh, video & phụ đề (FFmpeg)...",
+            "preview_audio": audio_url,
+        })
+
+        final_fn = f"autoprod_{task_id}.mp4"
+        final_path = os.path.join(VIDEOS_DIR, final_fn)
+
+        srt_path = None
+        if req.add_subtitles:
+            srt_fn = f"autoprod_{task_id}.srt"
+            srt_path = os.path.join(AUDIO_DIR, srt_fn)
+            _generate_srt_file(voice_text, audio_dur, srt_path)
+
+        _mux_with_subtitles(raw_vid_local, audio_path, srt_path, final_path)
+        final_url = f"/kol/media/videos/{final_fn}"
+
+        if os.path.exists(final_path):
+            shutil.copy2(final_path, os.path.join(p_gallery, final_fn))
+
+        AUTO_TASKS[task_id].update({
+            "status": "completed",
+            "progress": 100,
+            "phase": "5/5",
+            "step": "🎉 Hoàn tất! Video thành phẩm đã sẵn sàng phát.",
+            "result": {
+                "final_video_url": final_url,
+                "image_url": img_url,
+                "raw_video_url": raw_vid_url,
+                "audio_url": audio_url,
+                "title": title,
+                "voice_text": voice_text,
+                "caption": caption,
+                "character": profile["name"],
+                "audio_duration": round(audio_dur, 1),
+            }
+        })
+        log.info("[KOL] Auto production %s completed successfully: %s", task_id, final_url)
+
+    except Exception as exc:
+        log.exception("[KOL] Auto production %s failed: %s", task_id, exc)
+        AUTO_TASKS[task_id].update({
+            "status": "failed",
+            "progress": 0,
+            "error": str(exc),
+            "step": f"Thất bại: {exc}",
+        })
+
+
+@router.post("/auto-produce")
+async def start_auto_produce(req: AutoProduceReq):
+    profiles = _load_profiles()
+    profile = next((p for p in profiles if p["id"] == req.profile_id), None)
+    if not profile:
+        raise HTTPException(404, "Không tìm thấy hồ sơ KOL")
+    if not req.user_idea.strip():
+        raise HTTPException(400, "Vui lòng nhập ý tưởng tình huống")
+
+    task_id = f"auto_{uuid.uuid4().hex[:10]}"
+    AUTO_TASKS[task_id] = {
+        "id": task_id,
+        "status": "processing",
+        "progress": 10,
+        "phase": "0/5",
+        "step": "Đang khởi tạo chu trình sản xuất video trọn gói...",
+        "created_at": int(time.time()),
+        "profile_id": req.profile_id,
+        "user_idea": req.user_idea,
+        "result": None,
+        "error": None,
+        "preview_image": None,
+        "preview_video": None,
+        "preview_audio": None,
+    }
+
+    import threading
+    threading.Thread(target=_run_auto_produce_worker, args=(task_id, req), daemon=True).start()
+    return {"status": "queued", "task_id": task_id, "progress": 10}
+
+
+@router.get("/auto-tasks/{task_id}")
+def get_auto_produce_task(task_id: str):
+    task = AUTO_TASKS.get(task_id)
+    if not task:
+        raise HTTPException(404, "Không tìm thấy tác vụ sản xuất")
+    return task

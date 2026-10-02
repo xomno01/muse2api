@@ -846,7 +846,7 @@ class MuseEngine:
 
         t_sent = time.time()
         deadline = t_sent + timeout
-        first_token_deadline = min(deadline, t_sent + 30.0)
+        first_token_deadline = min(deadline, t_sent + 60.0)
         got_first = False
 
         # 等新回复出现：单次 CDP 轮询合并滚动+气泡检测，80ms 极速响应
